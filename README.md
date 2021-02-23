@@ -11,7 +11,7 @@ First install miniconda if you have not already done this.
 Required libs are listed in the file env.haybaler.yml
 ```
 # first clone haybaler
-git clone xxx
+git clone https://github.com/MHH-RCUG/haybaler
 cd haybaler
 # Set up a dedicated environment for haybaler
 conda env create -f env.haybaler.yml
