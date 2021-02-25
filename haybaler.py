@@ -1,5 +1,5 @@
 # Haybaler
-# Sophia Poertner, Nov 2020, Jan 2021
+# Sophia Poertner, Nov 2020 - Feb 2021
 
 # Combine your Wochenende .bam.txt or reporting output from multiple samples into one matrix per stat.
 # Usage: bash run_haybaler.sh
@@ -10,9 +10,10 @@ import click
 import os.path
 import re
 
-version = "0.21 - Feb 2021"
+version = "0.22 - Feb 2021"
 
 # changelog
+# 0.22 bugfix, correct gc_ref and chr_length for new chromosomes
 # 0.21 fix ordering problems
 # 0.20 add find_order and sort_new functions, so taxa with highest readcounts come first
 # 0.11 add heatmap prep and R scripts
@@ -47,6 +48,16 @@ def join_dfs(file, name, path, column, input_name):
         old = pd.read_csv(path + "/" + column + "_" + name, decimal=",", index_col=0, sep='\t')
         old.fillna(0.0, inplace=True)
         if sample not in old.columns:  # no double samples
+            new_chr = []  # get chromosomes which are new in this sample
+            for chromosome in file.index:
+                if chromosome not in old.index:
+                    new_chr.append(chromosome)
+            # get a df with the chr_length and gc_ref from the new chromosomes
+            if 'gc_ref' in file:
+                new_chr_df = file.loc[new_chr, ['chr_length', 'gc_ref']]
+            else:
+                new_chr_df = file.loc[new_chr, ['chr_length']]
+            old = old.append(new_chr_df)  # append the df with chr_length and gc_ref to the old df
             new = pd.concat([old, sub_df], axis=1, sort=False)  # add the new column to the old df
             if 'gc_ref' not in new and 'gc_ref' in file:
                 gc = file[['gc_ref']].copy()
