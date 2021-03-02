@@ -10,7 +10,6 @@ then
 else
   haybaler_dir="$1"
 fi
-echo "$haybaler_dir"
 
 outputDir=haybaler_output
 if [ ! -d $outputDir ]
