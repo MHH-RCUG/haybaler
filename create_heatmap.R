@@ -6,7 +6,7 @@
 usage = "Usage: Rscript create_heatmap.R infile.csv"
 usage
 
-version = "0.13"
+version = "0.14"
 version
 
 # changelog
