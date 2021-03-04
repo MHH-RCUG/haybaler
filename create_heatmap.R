@@ -5,10 +5,12 @@
 usage = "Usage: Rscript create_heatmap.R infile.csv"
 usage
 
-version = "0.11"
+version = "0.13"
 version
 
 # changelog
+# 0.13  sqrt as default transform. log(0) is -Inf, log(0.6) is negative, also bact_per_hum_cell too close to 0 to simply add 1
+# 0.12  change colours cool_warm blue to red default
 # 0.11  change colours
 # 0.10  add heatmaply interactive heatmap variant
 
@@ -23,7 +25,8 @@ file
 # Variables
 path = "."              # Path to your data, default current dir "."
 directory = "."         # directory you want the heatmap to be saved in ("." is current dir)
-outputname = paste0(file,"_","heatmap.pdf")
+# Names are further changed below
+output_pdf = paste0(file,"_","heatmap.pdf")
 output_html = paste0(file,"_","heatmaply.html")
 output_png = paste0(file,"_","heatmaply.png")
 
@@ -49,13 +52,24 @@ heatmap(
 # save the heatmap
 setwd(directory)
 
-pdf(outputname, width=16, height=8)
+output_pdf = paste0(file,"_","heatmap1_raw.pdf")
+pdf(output_pdf, width=16, height=8)
 heatmap(
         your_data_2, 
         cexRow = size_rows, 
         cexCol = size_columns
         )
 dev.off()
+
+output_pdf = paste0(file,"_","heatmap2_sqrt.pdf")
+pdf(output_pdf, width=16, height=8)
+heatmap(
+        sqrt(your_data_2),
+        cexRow = size_rows,
+        cexCol = size_columns
+        )
+dev.off()
+
 
 # create an interactive HTML heatmap with heatmaply
 # Other color options see https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
@@ -64,13 +78,31 @@ dev.off()
 # install.packages(heatmaply)
 library(heatmaply)
 
+output_html = paste0(file,"_","heatmaply1_raw.html")
 heatmaply(
         your_data_2, 
         #color = YlGn,
-        color = Blues,
-        #color = cool_warm,
+        #color = Blues,
+        color = cool_warm,
         #file=c(output_html, output_png)  #png needs another missing dependency
         file=c(output_html)
 )
-
+output_html = paste0(file,"_","heatmaply2_sqrt.html")
+heatmaply(
+        sqrt(your_data_2), 
+        #color = YlGn,
+        #color = Blues,
+        color = cool_warm,
+        #file=c(output_html, output_png)  #png needs another missing dependency
+        file=c(output_html)
+)
+output_html = paste0(file,"_","heatmaply3_percentize.html")
+heatmaply(
+        percentize(your_data_2), 
+        #color = YlGn,
+        #color = Blues,
+        color = cool_warm,
+        #file=c(output_html, output_png)  #png needs another missing dependency
+        file=c(output_html)
+)
 
