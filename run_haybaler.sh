@@ -30,12 +30,25 @@ cp $haybaler_dir/prepare_for_R_heatmap.sh $outputDir
 cp $haybaler_dir/runbatch_create_heatmap.sh $outputDir
 cp $haybaler_dir/create_heatmap.R $outputDir
 
-for csv in $(ls *.bam*.csv)
-do
-  python3 haybaler.py -i "$csv" -p . -op $outputDir  -o haybaler.csv
-done
 
-for csv in $(ls *.bam*.txt)
-do
-  python3 haybaler.py -i "$csv" -p . -op $outputDir  -o haybaler.csv
-done
+# Only run for *bam*.csv if files exist in current dir
+count=`ls -1 *.bam*.csv 2>/dev/null | wc -l`
+if [ $count != 0 ]
+    then
+    for csv in $(ls *.bam*.csv)
+    do
+      python3 haybaler.py -i "$csv" -p . -op $outputDir  -o haybaler.csv
+    done
+fi
+
+
+# Only run for *bam*.txt if files exist in current dir
+count=`ls -1 *.bam*.txt 2>/dev/null | wc -l`
+if [ $count != 0 ]
+    then
+    for csv in $(ls *.bam*.txt)
+    do
+      python3 haybaler.py -i "$csv" -p . -op $outputDir  -o haybaler.csv
+    done
+fi
+
