@@ -32,7 +32,7 @@ cp $haybaler_dir/create_heatmap.R $outputDir
 
 
 # Only run for *bam*.csv if files exist in current dir
-count=`ls -1 *.bam*.csv 2>/dev/null | wc -l`
+count=`ls -1 *mq30.bam*us*.csv 2>/dev/null | wc -l`
 if [ $count != 0 ]
     then
     for csv in $(ls *.bam*.csv)
@@ -43,7 +43,7 @@ fi
 
 
 # Only run for *bam*.txt if files exist in current dir
-count=`ls -1 *.bam*.txt 2>/dev/null | wc -l`
+count=`ls -1 *mq30.bam*.txt 2>/dev/null | wc -l`
 if [ $count != 0 ]
     then
     for csv in $(ls *.bam*.txt)
