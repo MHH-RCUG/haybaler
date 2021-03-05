@@ -7,9 +7,6 @@ echo "Starting Haybaler"
 # set directory to get the haybaler heatmaps scripts from
 # use default directory if no argument ($1) given
 
-# set debug to 1, (default 0) to print diagnostic messages
-debug=0
-
 # Users: change this to your haybaler path
 haybaler_directory="/mnt/ngsnfs/tools/dev/haybaler/" 
 
@@ -38,10 +35,6 @@ cp $haybaler_dir/create_heatmap.R $outputDir
 count=`ls -1 *mq30.bam*us*.csv 2>/dev/null | wc -l`
 if [ $count != 0 ]
     then
-    if [ $debug != 0 ]
-	  then
-	  echo "Found $count mq30.bam*us csv files to process"
-    fi
     for csv in $(ls *.bam*.csv)
     do
       python3 haybaler.py -i "$csv" -p . -op $outputDir  -o haybaler.csv
@@ -53,10 +46,6 @@ fi
 count=`ls -1 *mq30.bam*.txt 2>/dev/null | wc -l`
 if [ $count != 0 ]
     then
-    if [ $debug != 0 ]
-          then
-          echo "Found $count mq30.bam*us txt files to process"
-    fi
     for csv in $(ls *.bam*.txt)
     do
       python3 haybaler.py -i "$csv" -p . -op $outputDir  -o haybaler.csv
