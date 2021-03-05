@@ -2,20 +2,36 @@
 # Sophia Pörtner, Dec. 2020
 # heatmap requires base R
 # the interactive heatmaply variant requires heatmaply # install.packages(heatmaply)
+
 usage = "Usage: Rscript create_heatmap.R infile.csv"
 usage
 
-version = "0.13"
+version = "0.14"
 version
 
 # changelog
+# 0.14  check if required packages are installed, install them if not.
 # 0.13  sqrt as default transform. log(0) is -Inf, log(0.6) is negative, also bact_per_hum_cell too close to 0 to simply add 1
 # 0.12  change colours cool_warm blue to red default
 # 0.11  change colours
 # 0.10  add heatmaply interactive heatmap variant
 
+
+## check if required packages are installed, install if not. Then load all packages
+
+# packages
+packages = c("heatmaply")
+
+# install uninstalled packages
+not_installed <- packages[!(packages %in% installed.packages()[ , "Package"])]  # Extract not installed packages
+if(length(not_installed)) install.packages(not_installed, repos="http://cran.rstudio.com/")  # Install not installed packages from cran 
+
+#load packages
+invisible(lapply(packages, library, character.only = TRUE))
+
+
 args <- commandArgs()
-#args
+# args
 file<-args[6]   # name of file of your data
 
 cmd_msg = "File to process: "
@@ -75,8 +91,6 @@ dev.off()
 # Other color options see https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
 # We don't want a divergent colour palette which accentuates deviations from the mean
 
-# install.packages(heatmaply)
-library(heatmaply)
 
 output_html = paste0(file,"_","heatmaply1_raw.html")
 heatmaply(
