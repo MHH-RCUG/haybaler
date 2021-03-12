@@ -6,10 +6,11 @@
 usage = "Usage: Rscript create_heatmap.R infile.csv"
 usage
 
-version = "0.14"
+version = "0.15"
 version
 
 # changelog
+# 0.15  add simple scale legend on base R heatmap
 # 0.14  check if required packages are installed, install them if not.
 # 0.13  sqrt as default transform. log(0) is -Inf, log(0.6) is negative, also bact_per_hum_cell too close to 0 to simply add 1
 # 0.12  change colours cool_warm blue to red default
@@ -20,7 +21,7 @@ version
 ## check if required packages are installed, install if not. Then load all packages
 
 # packages
-packages = c("heatmaply")
+packages = c("heatmaply", "RColorBrewer")
 
 # install uninstalled packages
 not_installed <- packages[!(packages %in% installed.packages()[ , "Package"])]  # Extract not installed packages
@@ -63,7 +64,7 @@ heatmap(
         your_data_2, 
         cexRow = size_rows, 
         cexCol = size_columns
-        )
+)
 
 # save the heatmap
 setwd(directory)
@@ -73,8 +74,13 @@ pdf(output_pdf, width=16, height=8)
 heatmap(
         your_data_2, 
         cexRow = size_rows, 
-        cexCol = size_columns
-        )
+        cexCol = size_columns, 
+        col = colorRampPalette(brewer.pal(8, "Oranges"))(25)
+) 
+#attempt to add scale/ legend
+legend(x="bottomright", legend=c("min", "ave", "max"),
+     fill=colorRampPalette(brewer.pal(8, "Oranges"))(3))
+
 dev.off()
 
 output_pdf = paste0(file,"_","heatmap2_sqrt.pdf")
@@ -82,8 +88,13 @@ pdf(output_pdf, width=16, height=8)
 heatmap(
         sqrt(your_data_2),
         cexRow = size_rows,
-        cexCol = size_columns
-        )
+        cexCol = size_columns,
+        col= colorRampPalette(brewer.pal(8, "Oranges"))(25)
+)
+#attempt to add scale/ legend
+legend(x="bottomright", legend=c("min", "ave", "max"), 
+     fill=colorRampPalette(brewer.pal(8, "Oranges"))(3))
+
 dev.off()
 
 
