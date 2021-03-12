@@ -6,10 +6,11 @@
 usage = "Usage: Rscript create_heatmap.R infile.csv"
 usage
 
-version = "0.15"
+version = "0.16"
 version
 
 # changelog
+# 0.16  remove code which generated the unnamed Rplots.pdf
 # 0.15  add simple scale legend on base R heatmap
 # 0.14  check if required packages are installed, install them if not.
 # 0.13  sqrt as default transform. log(0) is -Inf, log(0.6) is negative, also bact_per_hum_cell too close to 0 to simply add 1
@@ -60,15 +61,10 @@ your_data_2 = as.matrix(your_data)
 size_rows <- 0.6
 size_columns <- 0.6
 
-heatmap(
-        your_data_2, 
-        cexRow = size_rows, 
-        cexCol = size_columns
-)
-
-# save the heatmap
+# Set the working directory
 setwd(directory)
 
+# raw heatmap
 output_pdf = paste0(file,"_","heatmap1_raw.pdf")
 pdf(output_pdf, width=16, height=8)
 heatmap(
@@ -83,6 +79,7 @@ legend(x="bottomright", legend=c("min", "ave", "max"),
 
 dev.off()
 
+# square root normalized
 output_pdf = paste0(file,"_","heatmap2_sqrt.pdf")
 pdf(output_pdf, width=16, height=8)
 heatmap(
@@ -103,6 +100,7 @@ dev.off()
 # We don't want a divergent colour palette which accentuates deviations from the mean
 
 
+# raw
 output_html = paste0(file,"_","heatmaply1_raw.html")
 heatmaply(
         your_data_2, 
@@ -112,6 +110,8 @@ heatmaply(
         #file=c(output_html, output_png)  #png needs another missing dependency
         file=c(output_html)
 )
+
+# sqrt
 output_html = paste0(file,"_","heatmaply2_sqrt.html")
 heatmaply(
         sqrt(your_data_2), 
@@ -121,6 +121,8 @@ heatmaply(
         #file=c(output_html, output_png)  #png needs another missing dependency
         file=c(output_html)
 )
+
+# percentize (like percentage ranks)
 output_html = paste0(file,"_","heatmaply3_percentize.html")
 heatmaply(
         percentize(your_data_2), 
