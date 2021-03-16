@@ -46,7 +46,7 @@ def find_genus(split, refseq_name):
     if "genus" not in locals():
         print("It was not possible to detect the genus for ", refseq_name)
         genus = "UNKNOWN"
-    # print(genus)
+        print(genus)
     return genus
 
 
@@ -54,6 +54,8 @@ def find_genus(split, refseq_name):
 @click.option('--input_file', '-i', help='Name of the input file')
 @click.option('--input_path', '-p', help='Path of the input file')
 def main(input_file, input_path):
+
+    pd.set_option('display.max_rows', 100000)
     print(pytaxonkit.name2taxid(["Human papillomavirus", "Human herpesvirus"]))
     csv = read_csv(input_file, input_path)
     genus = shorten_organism_names(csv)
