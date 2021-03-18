@@ -10,9 +10,10 @@ import click
 import os.path
 import re
 
-version = "0.22 - Feb 2021"
+version = "0.23 - Mar 2021"
 
 # changelog
+# 0.23 improve file input and arg handling
 # 0.22 bugfix, correct gc_ref and chr_length for new chromosomes
 # 0.21 fix ordering problems
 # 0.20 add find_order and sort_new functions, so taxa with highest readcounts come first
