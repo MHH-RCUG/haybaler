@@ -51,8 +51,8 @@ def find_genus(split, refseq_name):
 
 
 @click.command()
-@click.option('--input_file', '-i', help='Name of the input file')
-@click.option('--input_path', '-p', help='Path of the input file')
+@click.option('--input_file', '-i', help='Name of the input file', required=True)
+@click.option('--input_path', '-p', help='Path of the input file', required=True)
 def main(input_file, input_path):
 
     pd.set_option('display.max_rows', 100000)
