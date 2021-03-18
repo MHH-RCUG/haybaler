@@ -11,8 +11,8 @@
 - Haybaler collates the different files to one file per result type containing all samples
 - one file per sample containing all results -> one file per result type containing all samples
 - Less files, easy to compare different samples
-- The haybaler output is ordered after read count:
-- the organisms/chromosome with the highest read count over all samples will be at the top of the file
+- The haybaler output is ordered by read count: the organisms/chromosome with the highest read count over all samples will be at the top of the haybaler output file
+- Scripts allow data preparation for heatmaps and further analyses in R.
 
 
 ### Installation via conda
@@ -51,9 +51,9 @@ Output is a set of CSVs. These combine the results from the original files into 
 
 You can read the output into R for example and do further analyses yourself, or use our heatmap scripts
 - exclude mouse, human, mito
-- heatmap for the first 50 organisms (version 0.16)
-- use base R heatmap and heatmaply heatmaps function
-- use raw and sqarerooted results
+- heatmap for the top x organisms (default 50 taxa in version 0.16)
+- use both base R heatmap and heatmaply heatmaps
+- display raw and square-rooted results
 
 ```
 # go to the haybaler output file
