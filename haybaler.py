@@ -119,8 +119,8 @@ def adding_species(path, column, name):
 
 
 @click.command()
-@click.option('--input_file', '-i', help='Name of the input file')
-@click.option('--input_path', '-p', help='Path of the input file')
+@click.option('--input_file', '-i', help='Name of the input file', required=True)
+@click.option('--input_path', '-p', help='Path of the input file', required=True)
 @click.option('--output_path', '-op', help='Name of the output path')
 @click.option('--output_file', '-o', help='Name of the output file')
 def main(input_file, input_path, output_path, output_file):
