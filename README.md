@@ -6,6 +6,15 @@
 - Works only for Wochenende https://github.com/MHH-RCUG/Wochenende, not for Kraken (kraken2table projects exist online for that).
 
 
+### Details
+- Wochenende ouputs many files per sample. Every file contains different result types
+- Haybaler collates the different files to one file per result type containing all samples
+- one file per sample containing all results -> one file per result type containing all samples
+- Less files, easy to compare different samples
+- The haybaler output is ordered after read count:
+- the organisms/chromosome with the highest read count over all samples will be at the top of the file
+
+
 ### Installation via conda
 First install miniconda if you have not already done this.
 Required libs are listed in the file env.haybaler.yml
@@ -41,11 +50,18 @@ Output is a set of CSVs. These combine the results from the original files into 
 ### Refining the output
 
 You can read the output into R for example and do further analyses yourself, or use our heatmap scripts
+- exclude mouse, human, mito
+- heatmap for the first 50 organisms (version 0.16)
+- use base R heatmap and heatmaply heatmaps function
+- use raw and sqarerooted results
 
 ```
+# go to the haybaler output file
 # First prepare the data for a heatmap
 prepare_for_R_heatmap.sh  
 
 # Now run the Rscript to create a heatmap, this requires an R installation.
+# Because of a bug with heatmaply and conda, no conda enviroment is allowed to be activated
+conda deactivate
 runbatch_create_heatmap.sh  
 ```
