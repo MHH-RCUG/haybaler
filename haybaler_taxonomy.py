@@ -57,8 +57,8 @@ def find_genus(split, refseq_name):
                     # print(genus)
                     break
     if "genus" not in locals():
-        print("It was not possible to detect the genus for ", refseq_name)
-        genus = "UNKNOWN"
+        # print("It was not possible to detect the genus for ", refseq_name)
+        genus = "NOT KNOWN"
     return genus
 
 
@@ -81,9 +81,14 @@ def main(input_file, input_path):
         csv.insert(loc=0, column='genus', value=genus_series.values)
         save_csv(csv, input_path, input_file)
     else:
-        print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't worked with pytaxonkit
-        print("Number of reference names that didn't work with pytaxonkit: ", len(taxonomy[taxonomy["TaxID"].isna()]))
-        print("total number of reference names: ", len(genus))
+        total_chr = len(genus)
+        chr_not_work = len(taxonomy[taxonomy["TaxID"].isna()])
+        chr_work = total_chr - chr_not_work
+        # print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't worked with pytaxonkit
+        print("reference tested:", input_file)
+        print(total_chr, "total chromosomes,", chr_work, "chromosomes work,", chr_not_work, "do not work")
+        print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "works not")
+        print("")
     # print(result[['TaxID', 'Name', 'Lineage']])
 
 
