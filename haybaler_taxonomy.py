@@ -94,7 +94,7 @@ def main(input_file, input_path):
         print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't work with pytaxonkit
         print("reference tested:", input_file)
         print(total_chr, "total chromosomes,", chr_work, "chromosomes were OK,", chr_not_work, "Did not work")
-        print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "Die not work")
+        print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "Did not work")
         print("")
     # print(result[['TaxID', 'Name', 'Lineage']])
 
