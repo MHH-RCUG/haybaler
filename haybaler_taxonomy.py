@@ -1,10 +1,11 @@
-# script to add taxonomy data to habyaler output .csv using pytaxonkit
+# script to add taxonomy data to haybaler output .csv using pytaxonkit
 # Sophia Poertner, Jan - March 2021
 
 import pytaxonkit
 import pandas as pd
 import click
 import re
+import sys
 
 
 def has_numbers(input_string):
@@ -19,7 +20,6 @@ def read_csv(file, path):
 def shorten_organism_names(csv):
     genus = []
     for organism in csv.index:
-        organism = organism.replace("1_1_1_", "chr")
         organism = organism.replace("organism_", "")
         organism = re.sub(r'^.*?:', '', organism)
         split = organism.split(sep="_")
@@ -31,8 +31,8 @@ def shorten_organism_names(csv):
 
 def find_genus(split, refseq_name):
     # for human chromosomes
-    if re.search("^chr", split[0]):
-        genus = split[0]
+    if re.search("^1_1_1_", refseq_name):
+        genus = "homo sapiens"
     else: 
         if split[0] in ("NC", "AC", "NZ", "ENA"):
             del split[0]
@@ -63,7 +63,11 @@ def find_genus(split, refseq_name):
 
 
 def save_csv(csv, path, name):
-    csv.to_csv(path + "/" + name.replace("haybaler", "haybaler_genus"), sep="\t")
+    if "haybaler" in name:
+        csv.to_csv(path + "/" + name.replace("haybaler", "haybaler_genus"), sep="\t")
+    else:
+        sys.exit("ERROR: Inputfile {} has wrong file name. Needs a *haybaler.csv as input otherwise the inputfile "
+                 "gets overwritten.".format(name))
 
 
 @click.command()
@@ -77,14 +81,17 @@ def main(input_file, input_path):
     genus = shorten_organism_names(csv)
     taxonomy = pytaxonkit.name2taxid(genus)
     if not test_references:
-        genus_series = pd.Series(genus)
+        nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())
+        # replace every name that produces as NAN output in pytaxonkit with "NOT KNOWN"
+        genus_less_nan = ["NOT KNOWN" if name in nan_list else name for name in genus]
+        genus_series = pd.Series(genus_less_nan)
         csv.insert(loc=0, column='genus', value=genus_series.values)
         save_csv(csv, input_path, input_file)
     else:
         total_chr = len(genus)
         chr_not_work = len(taxonomy[taxonomy["TaxID"].isna()])
         chr_work = total_chr - chr_not_work
-        # print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't worked with pytaxonkit
+        print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't worked with pytaxonkit
         print("reference tested:", input_file)
         print(total_chr, "total chromosomes,", chr_work, "chromosomes work,", chr_not_work, "do not work")
         print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "works not")
