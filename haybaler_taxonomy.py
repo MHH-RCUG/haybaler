@@ -32,8 +32,8 @@ def shorten_organism_names(csv):
 def find_genus(split, refseq_name):
     # for human chromosomes
     if re.search("^1_1_1_", refseq_name):
-        genus = "homo"
-    else: 
+        genus = "Homo"
+    else:
         if split[0] in ("NC", "AC", "NZ", "ENA"):
             del split[0]
         for element in split:
@@ -66,13 +66,13 @@ def save_csv(csv, path, name):
     if "haybaler" in name:
         csv.to_csv(path + "/" + name.replace("haybaler", "haybaler_genus"), sep="\t")
     else:
-        sys.exit("ERROR: Inputfile {} has wrong file name. Needs a *haybaler.csv as input otherwise the inputfile "
+        sys.exit("ERROR: Input file {} has an incompatible file name. Needs a *haybaler.csv as input otherwise the inputfile "
                  "gets overwritten.".format(name))
 
 
 @click.command()
 @click.option('--input_file', '-i', help='Name of the input file', required=True)
-@click.option('--input_path', '-p', help='Path of the input file', required=True)
+@click.option('--input_path', '-p', help='Path of the input file, use . for current directory', required=True)
 def main(input_file, input_path):
     # Mode for testing References. True or False
     test_references = False
@@ -91,10 +91,10 @@ def main(input_file, input_path):
         total_chr = len(genus)
         chr_not_work = len(taxonomy[taxonomy["TaxID"].isna()])
         chr_work = total_chr - chr_not_work
-        print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't worked with pytaxonkit
+        print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't work with pytaxonkit
         print("reference tested:", input_file)
-        print(total_chr, "total chromosomes,", chr_work, "chromosomes work,", chr_not_work, "do not work")
-        print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "works not")
+        print(total_chr, "total chromosomes,", chr_work, "chromosomes were OK,", chr_not_work, "Did not work")
+        print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "Die not work")
         print("")
     # print(result[['TaxID', 'Name', 'Lineage']])
 
