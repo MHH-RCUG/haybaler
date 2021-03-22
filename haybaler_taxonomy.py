@@ -32,7 +32,7 @@ def shorten_organism_names(csv):
 def find_genus(split, refseq_name):
     # for human chromosomes
     if re.search("^1_1_1_", refseq_name):
-        genus = "homo sapiens"
+        genus = "homo"
     else: 
         if split[0] in ("NC", "AC", "NZ", "ENA"):
             del split[0]
