@@ -1,5 +1,8 @@
 # script to add taxonomy data to haybaler output .csv using pytaxonkit
 # Sophia Poertner, Jan - March 2021
+# Usage: conda activate haybaler
+# Usage: python3 haybaler_taxonomy.py  -i 2021_02_human_bact_fungi_vir_masked.fa.fai -p /lager2/rcug/seqres/metagenref/
+# Usage: python3 haybaler_taxonomy.py  -i RPMM_haybaler.csv -p ./control_dataset/haybaler_output/
 
 import pytaxonkit
 import pandas as pd
