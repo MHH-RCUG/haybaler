@@ -17,11 +17,44 @@ def read_csv(file, path):
     return csv
 
 
+# work in progress - not used yet
+def find_species(csv):
+    species = []
+    for organism in csv.index:
+        organism = organism.replace("organism_", "")
+        organism = organism.replace("1_1_1", "Homo_sapiens_")
+        organism = re.sub(r'^.*?:', '', organism)
+        m = re.findall('[A-Z][a-z]+_[a-z]+', organism)
+        if len(m) != 0:
+            m[0] = m[0].replace("_", " ")
+            name = (m[0])
+        else:
+            name = "NOT KNOWN"
+        print(name)
+        species.append(name)
+    taxonomy = pytaxonkit.name2taxid(species)
+    nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())  # list of names that produce NAN
+    genus_series = pd.Series(species)
+    csv.insert(loc=0, column='genus', value=genus_series.values)
+    print(csv[csv['genus'].isin(nan_list)]["genus"])  # print everything that didn't work with pytaxonkit
+    total_chr = len(species)
+    chr_not_work = len(taxonomy[taxonomy["TaxID"].isna()])
+    chr_work = total_chr - chr_not_work
+    print("reference tested:", "test")
+    print(total_chr, "total chromosomes,", chr_work, "chromosomes work,", chr_not_work, "do not work")
+    print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "works not")
+    print("")
+    # print(species)
+    # print(len(species))
+    # print(species.count("NOT KNOWN"))
+    return species
+
+
 def shorten_organism_names(csv):
     genus = []
     for organism in csv.index:
         organism = organism.replace("organism_", "")
-        organism = re.sub(r'^.*?:', '', organism)
+        organism = re.sub(r'^.*?:', '', organism)  # replace everything before an ":" with nothing
         split = organism.split(sep="_")
         name = find_genus(split, organism)
         genus.append(name)
@@ -32,7 +65,7 @@ def shorten_organism_names(csv):
 def find_genus(split, refseq_name):
     # for human chromosomes
     if re.search("^1_1_1_", refseq_name):
-        genus = "homo sapiens"
+        genus = "homo"
     else: 
         if split[0] in ("NC", "AC", "NZ", "ENA"):
             del split[0]
@@ -78,6 +111,7 @@ def main(input_file, input_path):
     test_references = False
     pd.set_option('display.max_rows', 100000)
     csv = read_csv(input_file, input_path)
+    # find_species(csv)  # work in progress
     genus = shorten_organism_names(csv)
     taxonomy = pytaxonkit.name2taxid(genus)
     if not test_references:
@@ -88,10 +122,14 @@ def main(input_file, input_path):
         csv.insert(loc=0, column='genus', value=genus_series.values)
         save_csv(csv, input_path, input_file)
     else:
+        nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())  # list of names that produce NAN
+        genus_series = pd.Series(genus)
+        csv.insert(loc=0, column='genus', value=genus_series.values)
+        print(csv[csv['genus'].isin(nan_list)]["genus"])  # print everything that didn't work with pytaxonkit
+        # print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't worked with pytaxonkit (old)
         total_chr = len(genus)
         chr_not_work = len(taxonomy[taxonomy["TaxID"].isna()])
         chr_work = total_chr - chr_not_work
-        print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't worked with pytaxonkit
         print("reference tested:", input_file)
         print(total_chr, "total chromosomes,", chr_work, "chromosomes work,", chr_not_work, "do not work")
         print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "works not")
