@@ -61,12 +61,16 @@ your_data_2 = as.matrix(your_data)
 size_rows <- 0.6
 size_columns <- 0.6
 
+# 50 taxa is the reference. The proportion to 50 taxa is calculate to adjust the size of the pdf 
+num_taxa <- nrow(your_data_2)
+heatmap_size <- num_taxa / 50 
+
 # Set the working directory
 setwd(directory)
 
 # raw heatmap
 output_pdf = paste0(file,"_","heatmap1_raw.pdf")
-pdf(output_pdf, width=16, height=8)
+pdf(output_pdf, width=16*heatmap_size, height=8*heatmap_size)
 heatmap(
         your_data_2, 
         cexRow = size_rows, 
@@ -81,7 +85,7 @@ dev.off()
 
 # square root normalized
 output_pdf = paste0(file,"_","heatmap2_sqrt.pdf")
-pdf(output_pdf, width=16, height=8)
+pdf(output_pdf, width=16*heatmap_size, height=8*heatmap_size)
 heatmap(
         sqrt(your_data_2),
         cexRow = size_rows,
