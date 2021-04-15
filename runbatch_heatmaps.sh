@@ -3,6 +3,7 @@
 
 # Prepare data for R heatmaps
 # exclude GC, ref length, any host chr etc (all distort heatmaps)
+# Sophia Poertner, Colin Davenport, 2020-2021
 
 
 prepare_files () {
@@ -47,14 +48,22 @@ for heatmapcsv in `ls *.heatmap.csv`
 done
 }
 
-# heatmaps with 50 taxa
-mkdir top_50_taxa
+# Create heatmaps with 50 taxa
+if [ ! -d "top_50_taxa" ]
+        then
+	mkdir top_50_taxa
+fi
+# Run bash function for 50 taxa
 prepare_files 50
 create_heatmaps
 mv *heatmap*.html *heatmap*.pdf top_50_taxa
 
-# heatmaps with all taxa
-mkdir all_taxa
+# Create heatmaps with all taxa
+if [ ! -d "all_taxa" ]
+	then
+	mkdir all_taxa
+fi
+# Run bash function for all taxa
 prepare_files 10000000 # number of taxa is set so high its like all taxa, no sample should have more taxa
 create_heatmaps
 mv *heatmap*.html *heatmap*.pdf all_taxa
