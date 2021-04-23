@@ -111,7 +111,6 @@ def find_doubble_taxid(df, taxonomy_name):
     tripple_taxid = False  # True if one name has three TaxIDs
     columns = list(df.columns.values)
     new_df = pd.DataFrame(columns=columns)
-    # not_df = pd.DataFrame(columns=columns)  # df with wrong organisms
     # first filter for same name but different taxID
     for index, row in df.iterrows():
         # skip this and the next iteration
@@ -164,18 +163,18 @@ def find_doubble_taxid(df, taxonomy_name):
     new_df = new_df.reset_index(drop=True)
     new_df["Name"] = new_df["Name"].astype(str)
     columns = list(new_df.columns.values)
-    not_df_new = pd.DataFrame(columns=columns)  # df for wrong organisms
+    df_wrong_organisms = pd.DataFrame(columns=columns)  # df for wrong organisms
     # now filter for same input name but different output name
     # always take the organism with the same output and input name
     for index, row in new_df.iterrows():
         if index + 1 != len(new_df):
             if row["name2taxid_name"] == new_df["name2taxid_name"][index + 1] and row["Name"] != new_df["Name"][index + 1]:
                 if row["Name"] == row["name2taxid_name"]:
-                    not_df_new = not_df_new.append(new_df.iloc[index + 1, :])  # add wrong organisms to the not_df_new
+                    df_wrong_organisms = df_wrong_organisms.append(new_df.iloc[index + 1, :])  # add wrong organisms to the df_wrong_organisms
                 if new_df["Name"][index + 1] == row["name2taxid_name"]:
-                    not_df_new = not_df_new.append(row)  # add wrong organisms to the not_df_new
-    not_ids_new = set(not_df_new["TaxID"].values.tolist())  # get the IDs for the wrong organisms
-    new_df = new_df[~new_df['TaxID'].isin(not_ids_new)]  # new df which does not contain the wrong organisms
+                    df_wrong_organisms = df_wrong_organisms.append(row)  # add wrong organisms to the df_wrong_organisms
+    wrong_ids = set(df_wrong_organisms["TaxID"].values.tolist())  # get the IDs for the wrong organisms
+    new_df = new_df[~new_df['TaxID'].isin(wrong_ids)]  # new df which does not contain the wrong organisms
     new_df = new_df.reset_index(drop=True)
     return new_df
 
@@ -193,7 +192,7 @@ def save_csv(csv, path, name):
 @click.option('--input_path', '-p', help='Path of the input file, use . for current directory', required=True)
 def main(input_file, input_path):
     # Mode for testing References. True or False
-    test_references = True
+    test_references = False
     pd.set_option('display.max_rows', 100000)
     csv = read_csv(input_file, input_path)
     # find_species(csv, input_file, input_path)  # work in progress
