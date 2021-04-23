@@ -48,13 +48,13 @@ def find_species(csv, input_file, input_path):
     print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "works not")
     print("")
     taxids = taxonomy["TaxID"].to_list()
-    result = pytaxonkit.lineage(taxids)
-    # print(result)
-    # print(len(csv), len(result["FullLineage"]), len(genus_series), len(taxids), len(taxonomy))
+    lineage = pytaxonkit.lineage(taxids)
+    # print(lineage)
+    # print(len(csv), len(lineage["FullLineage"]), len(genus_series), len(taxids), len(taxonomy))
     # print(taxonomy, genus_series)
     # print(taxonomy)
-    value = result["FullLineage"].values
-    # value = result["Name"].values
+    value = lineage["FullLineage"].values
+    # value = lineage["Name"].values
     csv.insert(loc=1, column="lineage", value=value)
     # print(csv)
     save_csv(csv, input_path, input_file.replace(".csv", "_species.csv"))
@@ -96,7 +96,7 @@ def find_genus(split, refseq_name):
     return genus
 
 
-def find_doubble_taxa(df, taxonomy_name):
+def find_doubble_taxid(df, taxonomy_name):
     # In the package pytaxonkit i a phenomenon which make it hard to assign a lineage to the original reference name
     # The method name2taxid assigns a TaxID to every input name. But a few different organisms share the same name so
     # a few names there are 2 or more TaxIDs. name2taxid outputs all possible names so sometimes there are 2 or 3
@@ -107,75 +107,60 @@ def find_doubble_taxa(df, taxonomy_name):
     # We also need the input names (taxonomy_name)
     # -> filter for multiple lines in the input with the same name but different names in the output
     df["name2taxid_name"] = taxonomy_name  # input name
-    doubble_taxa = False  # True if one name has two TaxIDs
-    doubble_taxa_2 = False  # True if one name has three TaxIDs
+    doubble_taxid = False  # True if one name has two TaxIDs
+    tripple_taxid = False  # True if one name has three TaxIDs
     columns = list(df.columns.values)
     new_df = pd.DataFrame(columns=columns)
-    not_df = pd.DataFrame(columns=columns)  # df with wrong organisms
+    # not_df = pd.DataFrame(columns=columns)  # df with wrong organisms
     # first filter for same name but different taxID
     for index, row in df.iterrows():
         # skip this and the next iteration
-        if doubble_taxa_2:
-            doubble_taxa_2 = False
-            doubble_taxa = True
+        if tripple_taxid:
+            tripple_taxid = False
+            doubble_taxid = True
             continue
             # skip this  iteration
-        if doubble_taxa:
-            doubble_taxa = False
+        if doubble_taxid:
+            doubble_taxid = False
             continue
         if index + 1 != len(df):
             # if three have the same Name but different TaxIDs
             if row["Name"] == df["Name"][index + 1] and row["Name"] == df["Name"][index + 2] and row["TaxID"] != \
                     df["TaxID"][index + 1] and row["TaxID"] != df["TaxID"][index + 2] and df["TaxID"][index + 2] != \
                     df["TaxID"][index + 1]:
-                kingdome_1 = row["Lineage"].split(";")[0]
-                kingdome_2 = df["Lineage"][index + 1].split(";")[0]
-                kingdome_3 = df["Lineage"][index + 1].split(";")[0]
-                doubble_taxa_2 = True  # skip the next 2 iterations
+                domain_1 = row["Lineage"].split(";")[0]
+                domain_2 = df["Lineage"][index + 1].split(";")[0]
+                domain_3 = df["Lineage"][index + 1].split(";")[0]
+                tripple_taxid = True  # skip the next 2 iterations
                 # check if only one of the organisms is a bacteria. If yes, add this organism to the new df, else add
                 # just the name and leave the lineage empty
-                if kingdome_1 == "Bacteria" and kingdome_2 != "Bacteria" and kingdome_3 != "Bacteria":
+                if domain_1 == "Bacteria" and domain_2 != "Bacteria" and domain_3 != "Bacteria":
                     new_df = new_df.append(row)
-                    not_df = not_df.append(df.iloc[index + 1, :])
-                    not_df = not_df.append(df.iloc[index + 2, :])
-                elif kingdome_2 == "Bacteria" and kingdome_1 != "Bacteria" and kingdome_3 != "Bacteria":
+                elif domain_2 == "Bacteria" and domain_1 != "Bacteria" and domain_3 != "Bacteria":
                     new_df = new_df.append(df.iloc[index + 1, :])
-                    not_df = not_df.append(row)
-                    not_df = not_df.append(df.iloc[index + 2, :])
-                elif kingdome_3 == "Bacteria" and kingdome_1 != "Bacteria" and kingdome_2 != "Bacteria":
+                elif domain_3 == "Bacteria" and domain_1 != "Bacteria" and domain_2 != "Bacteria":
                     new_df = new_df.append(df.iloc[index + 2, :])
-                    not_df = not_df.append(row)
-                    not_df = not_df.append(df.iloc[index + 1, :])
                 else:
                     one_row = pd.DataFrame([row["Name"]], columns=["Name"])
                     new_df = pd.concat([new_df, one_row])
-                    not_df = not_df.append(row)
-                    not_df = not_df.append(df.iloc[index + 1, :])
-                    not_df = not_df.append(df.iloc[index + 2, :])
             # if two have the same Name but different TaxIDs
             elif row["Name"] == df["Name"][index + 1] and row["TaxID"] != df["TaxID"][index + 1]:
-                kingdome_1 = row["Lineage"].split(";")[0]
-                kingdome_2 = df["Lineage"][index + 1].split(";")[0]
-                doubble_taxa = True  # skip next iteration
+                domain_1 = row["Lineage"].split(";")[0]
+                domain_2 = df["Lineage"][index + 1].split(";")[0]
+                doubble_taxid = True  # skip next iteration
                 # check if only one of the organisms is a bacteria. If yes, add this organism to the new df, else add
                 # just the name and leave the lineage empty
-                if kingdome_1 == "Bacteria" and kingdome_2 != "Bacteria":
+                if domain_1 == "Bacteria" and domain_2 != "Bacteria":
                     new_df = new_df.append(row)
-                    not_df = not_df.append(df.iloc[index + 1, :])
-                elif kingdome_2 == "Bacteria" and kingdome_1 != "Bacteria":
+                elif domain_2 == "Bacteria" and domain_1 != "Bacteria":
                     new_df = new_df.append(df.iloc[index + 1, :])
-                    not_df = not_df.append(row)
                 else:
                     one_row = pd.DataFrame([row["Name"]], columns=["Name"])
                     new_df = pd.concat([new_df, one_row])
-                    not_df = not_df.append(row)
-                    not_df = not_df.append(df.iloc[index + 1, :])
             else:
                 new_df = new_df.append(row)
         else:
             new_df = new_df.append(row)
-    not_ids = set(not_df["TaxID"].values.tolist())  # get the ids of the wrong organisms
-    new_df = new_df[~new_df['TaxID'].isin(not_ids)]  # new df which does not contain the wrong organisms
     new_df = new_df.reset_index(drop=True)
     new_df["Name"] = new_df["Name"].astype(str)
     columns = list(new_df.columns.values)
@@ -215,14 +200,14 @@ def main(input_file, input_path):
     genus = shorten_organism_names(csv)
     taxonomy = pytaxonkit.name2taxid(genus)
     taxids = taxonomy["TaxID"].to_list()
-    result = pytaxonkit.lineage(taxids)
-    no_doubble_taxa = find_doubble_taxa(result, taxonomy["Name"])  # [["TaxID", "Name", "Lineage"]]
+    lineage = pytaxonkit.lineage(taxids)
+    filtered_csv = find_doubble_taxid(lineage, taxonomy["Name"])  # [["TaxID", "Name", "Lineage"]]
     if not test_references:
         nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())
         # replace every name that produces as NAN output in pytaxonkit with "NOT KNOWN"
         genus_less_nan = ["NOT KNOWN" if name in nan_list else name for name in genus]
         genus_series = pd.Series(genus_less_nan)
-        lineage_series = pd.Series(no_doubble_taxa["Lineage"].values)
+        lineage_series = pd.Series(filtered_csv["Lineage"].values)
         csv.insert(loc=0, column='genus', value=genus_series.values)
         csv.insert(loc=1, column='lineage', value=lineage_series.values)
         save_csv(csv, input_path, input_file)
@@ -237,17 +222,17 @@ def main(input_file, input_path):
         print("reference tested:", input_file)
         print(total_chr, "total chromosomes,", chr_work, "chromosomes were OK,", chr_not_work, "Did not work")
         print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "Did not work")
-        if len(genus) == len(no_doubble_taxa):
+        if len(genus) == len(filtered_csv):
             print("The input and the output for lineage are the same. Filtering has probably worked.")
         else:
-            print("The input is", len(genus), "organisms long. The output is", len(no_doubble_taxa),
+            print("The input is", len(genus), "organisms long. The output is", len(filtered_csv),
                   "long. In the process of getting taxid, lineage and filtering something must have gone wrong")
-            # compare the results in the different filter steps. Good for bug and reference testing
+            # compare the lineages in the different filter steps. Good for bug and reference testing
             # all_steps = pd.concat((pd.Series(csv.index.values), pd.Series(genus)), axis=1, ignore_index=True)
             # all_steps = pd.concat((all_steps, taxonomy[["Name", "TaxID"]]), axis=1, ignore_index=True)
-            # all_steps = pd.concat((all_steps, result["Name"]), axis=1, ignore_index=True)
-            # all_steps = pd.concat((all_steps, no_doubble_taxa["Name"]), axis=1, ignore_index=True)
-            # all_steps.columns = ["reference_name", "filtered_genus", "name_to_Taxid_Name", "name_to_taxid_TaxID", "lineage_Name", "no_doubble_taxa_Name"]
+            # all_steps = pd.concat((all_steps, lineage["Name"]), axis=1, ignore_index=True)
+            # all_steps = pd.concat((all_steps, filtered_csv["Name"]), axis=1, ignore_index=True)
+            # all_steps.columns = ["reference_name", "filtered_genus", "name_to_Taxid_Name", "name_to_taxid_TaxID", "lineage_Name", "filtered_csv_Name"]
             # all_steps.to_csv("compare_filter_steps.txt", index=False)
             # print(all_steps)
 
