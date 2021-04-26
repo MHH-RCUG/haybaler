@@ -96,7 +96,7 @@ def find_genus(split, refseq_name):
     return genus
 
 
-def find_doubble_taxid(df, taxonomy_name):
+def find_double_taxid(df, taxonomy_name):
     # In the package pytaxonkit i a phenomenon which make it hard to assign a lineage to the original reference name
     # The method name2taxid assigns a TaxID to every input name. But a few different organisms share the same name so
     # a few names there are 2 or more TaxIDs. name2taxid outputs all possible names so sometimes there are 2 or 3
@@ -107,20 +107,20 @@ def find_doubble_taxid(df, taxonomy_name):
     # We also need the input names (taxonomy_name)
     # -> filter for multiple lines in the input with the same name but different names in the output
     df["name2taxid_name"] = taxonomy_name  # input name
-    doubble_taxid = False  # True if one name has two TaxIDs
-    tripple_taxid = False  # True if one name has three TaxIDs
+    double_taxid = False  # True if one name has two TaxIDs
+    triple_taxid = False  # True if one name has three TaxIDs
     columns = list(df.columns.values)
     new_df = pd.DataFrame(columns=columns)
     # first filter for same name but different taxID
     for index, row in df.iterrows():
         # skip this and the next iteration
-        if tripple_taxid:
-            tripple_taxid = False
-            doubble_taxid = True
+        if triple_taxid:
+            triple_taxid = False
+            double_taxid = True
             continue
             # skip this  iteration
-        if doubble_taxid:
-            doubble_taxid = False
+        if double_taxid:
+            double_taxid = False
             continue
         if index + 1 != len(df):
             # if three have the same Name but different TaxIDs
@@ -130,7 +130,7 @@ def find_doubble_taxid(df, taxonomy_name):
                 domain_1 = row["Lineage"].split(";")[0]
                 domain_2 = df["Lineage"][index + 1].split(";")[0]
                 domain_3 = df["Lineage"][index + 1].split(";")[0]
-                tripple_taxid = True  # skip the next 2 iterations
+                triple_taxid = True  # skip the next 2 iterations
                 # check if only one of the organisms is a bacteria. If yes, add this organism to the new df, else add
                 # just the name and leave the lineage empty
                 if domain_1 == "Bacteria" and domain_2 != "Bacteria" and domain_3 != "Bacteria":
@@ -146,7 +146,7 @@ def find_doubble_taxid(df, taxonomy_name):
             elif row["Name"] == df["Name"][index + 1] and row["TaxID"] != df["TaxID"][index + 1]:
                 domain_1 = row["Lineage"].split(";")[0]
                 domain_2 = df["Lineage"][index + 1].split(";")[0]
-                doubble_taxid = True  # skip next iteration
+                double_taxid = True  # skip next iteration
                 # check if only one of the organisms is a bacteria. If yes, add this organism to the new df, else add
                 # just the name and leave the lineage empty
                 if domain_1 == "Bacteria" and domain_2 != "Bacteria":
@@ -200,7 +200,7 @@ def main(input_file, input_path):
     taxonomy = pytaxonkit.name2taxid(genus)
     taxids = taxonomy["TaxID"].to_list()
     lineage = pytaxonkit.lineage(taxids)
-    filtered_csv = find_doubble_taxid(lineage, taxonomy["Name"])  # [["TaxID", "Name", "Lineage"]]
+    filtered_csv = find_double_taxid(lineage, taxonomy["Name"])  # [["TaxID", "Name", "Lineage"]]
     if not test_references:
         nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())
         # replace every name that produces as NAN output in pytaxonkit with "NOT KNOWN"
