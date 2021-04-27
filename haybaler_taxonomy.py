@@ -21,7 +21,7 @@ def read_csv(file, path):
 
 
 # work in progress - not used yet
-def find_species(csv):
+def find_species(csv, input_file, input_path):
     species = []
     for organism in csv.index:
         organism = organism.replace("organism_", "")
@@ -33,13 +33,13 @@ def find_species(csv):
             name = (m[0])
         else:
             name = "NOT KNOWN"
-        print(name)
+        # print(name)
         species.append(name)
     taxonomy = pytaxonkit.name2taxid(species)
     nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())  # list of names that produce NAN
     genus_series = pd.Series(species)
     csv.insert(loc=0, column='genus', value=genus_series.values)
-    print(csv[csv['genus'].isin(nan_list)]["genus"])  # print everything that didn't work with pytaxonkit
+    # print(csv[csv['genus'].isin(nan_list)]["genus"])  # print everything that didn't work with pytaxonkit
     total_chr = len(species)
     chr_not_work = len(taxonomy[taxonomy["TaxID"].isna()])
     chr_work = total_chr - chr_not_work
@@ -47,10 +47,19 @@ def find_species(csv):
     print(total_chr, "total chromosomes,", chr_work, "chromosomes work,", chr_not_work, "do not work")
     print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "works not")
     print("")
+    taxids = taxonomy["TaxID"].to_list()
+    lineage = pytaxonkit.lineage(taxids)
+    # print(lineage)
+    # print(len(csv), len(lineage["FullLineage"]), len(genus_series), len(taxids), len(taxonomy))
+    # print(taxonomy, genus_series)
+    # print(taxonomy)
+    value = lineage["FullLineage"].values
+    # value = lineage["Name"].values
+    csv.insert(loc=1, column="lineage", value=value)
+    # print(csv)
+    save_csv(csv, input_path, input_file.replace(".csv", "_species.csv"))
     # print(species)
-    # print(len(species))
     # print(species.count("NOT KNOWN"))
-    return species
 
 
 def shorten_organism_names(csv):
@@ -61,7 +70,6 @@ def shorten_organism_names(csv):
         split = organism.split(sep="_")
         name = find_genus(split, organism)
         genus.append(name)
-        # print(organism, "    ", name)
     return genus
 
 
@@ -76,21 +84,11 @@ def find_genus(split, refseq_name):
             if not has_numbers(element) and element:
                 if not re.search("[Hh]uman", element):
                     genus = element
-                    # taxid = pytaxonkit.name2taxid([genus])
-                    # print(taxid["Rank"][0])
-                    # print(type(taxid["Rank"][0]))
-                    # if taxid["Rank"][0].isna():
-                    #     print("yes is na")
-                    #     print(taxid["Rank"][0])
                     break
                 else:  # for e.g. NC_001352_1_Human_papillomavirus___2__complete_genome_VIR
                     next_element_index = split.index(element) + 1
                     next_element = split[next_element_index]
                     genus = element + " " + next_element
-                    # taxid = (pytaxonkit.name2taxid([genus]))
-                    # if taxid["Rank"][0].isna():
-                    #     print(taxid["Rank"][0])
-                    # print(genus)
                     break
     if "genus" not in locals():
         # print("It was not possible to detect the genus for ", refseq_name)
@@ -98,12 +96,95 @@ def find_genus(split, refseq_name):
     return genus
 
 
+def find_double_taxid(df, taxonomy_name):
+    # In the package pytaxonkit i a phenomenon which make it hard to assign a lineage to the original reference name
+    # The method name2taxid assigns a TaxID to every input name. But a few different organisms share the same name so
+    # a few names there are 2 or more TaxIDs. name2taxid outputs all possible names so sometimes there are 2 or 3
+    # outputs for one input. We need to find out which TaxID is correct if possible.
+    # -> filter for multiple lines with the same name but different TaxIDs
+    # Additionally sometimes the method lineage outputs a different name than what was originally the input name so the
+    # above filter does not work anymore. Eg: input: Bacteroidetes ouputs: Bacteroidetes; Bacteroidia
+    # We also need the input names (taxonomy_name)
+    # -> filter for multiple lines in the input with the same name but different names in the output
+    df["name2taxid_name"] = taxonomy_name  # input name
+    double_taxid = False  # True if one name has two TaxIDs
+    triple_taxid = False  # True if one name has three TaxIDs
+    columns = list(df.columns.values)
+    new_df = pd.DataFrame(columns=columns)
+    # first filter for same name but different taxID
+    for index, row in df.iterrows():
+        # skip this and the next iteration
+        if triple_taxid:
+            triple_taxid = False
+            double_taxid = True
+            continue
+            # skip this  iteration
+        if double_taxid:
+            double_taxid = False
+            continue
+        if index + 1 != len(df):
+            # if three have the same Name but different TaxIDs
+            if row["Name"] == df["Name"][index + 1] and row["Name"] == df["Name"][index + 2] and row["TaxID"] != \
+                    df["TaxID"][index + 1] and row["TaxID"] != df["TaxID"][index + 2] and df["TaxID"][index + 2] != \
+                    df["TaxID"][index + 1]:
+                domain_1 = row["Lineage"].split(";")[0]
+                domain_2 = df["Lineage"][index + 1].split(";")[0]
+                domain_3 = df["Lineage"][index + 1].split(";")[0]
+                triple_taxid = True  # skip the next 2 iterations
+                # check if only one of the organisms is a bacteria. If yes, add this organism to the new df, else add
+                # just the name and leave the lineage empty
+                if domain_1 == "Bacteria" and domain_2 != "Bacteria" and domain_3 != "Bacteria":
+                    new_df = new_df.append(row)
+                elif domain_2 == "Bacteria" and domain_1 != "Bacteria" and domain_3 != "Bacteria":
+                    new_df = new_df.append(df.iloc[index + 1, :])
+                elif domain_3 == "Bacteria" and domain_1 != "Bacteria" and domain_2 != "Bacteria":
+                    new_df = new_df.append(df.iloc[index + 2, :])
+                else:
+                    one_row = pd.DataFrame([row["Name"]], columns=["Name"])
+                    new_df = pd.concat([new_df, one_row])
+            # if two have the same Name but different TaxIDs
+            elif row["Name"] == df["Name"][index + 1] and row["TaxID"] != df["TaxID"][index + 1]:
+                domain_1 = row["Lineage"].split(";")[0]
+                domain_2 = df["Lineage"][index + 1].split(";")[0]
+                double_taxid = True  # skip next iteration
+                # check if only one of the organisms is a bacteria. If yes, add this organism to the new df, else add
+                # just the name and leave the lineage empty
+                if domain_1 == "Bacteria" and domain_2 != "Bacteria":
+                    new_df = new_df.append(row)
+                elif domain_2 == "Bacteria" and domain_1 != "Bacteria":
+                    new_df = new_df.append(df.iloc[index + 1, :])
+                else:
+                    one_row = pd.DataFrame([row["Name"]], columns=["Name"])
+                    new_df = pd.concat([new_df, one_row])
+            else:
+                new_df = new_df.append(row)
+        else:
+            new_df = new_df.append(row)
+    new_df = new_df.reset_index(drop=True)
+    new_df["Name"] = new_df["Name"].astype(str)
+    columns = list(new_df.columns.values)
+    df_wrong_organisms = pd.DataFrame(columns=columns)  # df for wrong organisms
+    # now filter for same input name but different output name
+    # always take the organism with the same output and input name
+    for index, row in new_df.iterrows():
+        if index + 1 != len(new_df):
+            if row["name2taxid_name"] == new_df["name2taxid_name"][index + 1] and row["Name"] != new_df["Name"][index + 1]:
+                if row["Name"] == row["name2taxid_name"]:
+                    df_wrong_organisms = df_wrong_organisms.append(new_df.iloc[index + 1, :])  # add wrong organisms to the df_wrong_organisms
+                if new_df["Name"][index + 1] == row["name2taxid_name"]:
+                    df_wrong_organisms = df_wrong_organisms.append(row)  # add wrong organisms to the df_wrong_organisms
+    wrong_ids = set(df_wrong_organisms["TaxID"].values.tolist())  # get the IDs for the wrong organisms
+    new_df = new_df[~new_df['TaxID'].isin(wrong_ids)]  # new df which does not contain the wrong organisms
+    new_df = new_df.reset_index(drop=True)
+    return new_df
+
+
 def save_csv(csv, path, name):
     if "haybaler" in name:
         csv.to_csv(path + "/" + name.replace("haybaler", "haybaler_genus"), sep="\t")
     else:
-        sys.exit("ERROR: Input file {} has an incompatible file name. Needs a *haybaler.csv as input otherwise the inputfile "
-                 "gets overwritten.".format(name))
+        sys.exit("ERROR: Input file {} has an incompatible file name. Needs a *haybaler.csv as input otherwise the "
+                 "inputfile gets overwritten.".format(name))
 
 
 @click.command()
@@ -114,30 +195,45 @@ def main(input_file, input_path):
     test_references = False
     pd.set_option('display.max_rows', 100000)
     csv = read_csv(input_file, input_path)
-    # find_species(csv)  # work in progress
+    # find_species(csv, input_file, input_path)  # work in progress
     genus = shorten_organism_names(csv)
     taxonomy = pytaxonkit.name2taxid(genus)
+    taxids = taxonomy["TaxID"].to_list()
+    lineage = pytaxonkit.lineage(taxids)
+    filtered_csv = find_double_taxid(lineage, taxonomy["Name"])  # [["TaxID", "Name", "Lineage"]]
     if not test_references:
         nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())
         # replace every name that produces as NAN output in pytaxonkit with "NOT KNOWN"
         genus_less_nan = ["NOT KNOWN" if name in nan_list else name for name in genus]
         genus_series = pd.Series(genus_less_nan)
+        lineage_series = pd.Series(filtered_csv["Lineage"].values)
         csv.insert(loc=0, column='genus', value=genus_series.values)
+        csv.insert(loc=1, column='lineage', value=lineage_series.values)
         save_csv(csv, input_path, input_file)
     else:
         nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())  # list of names that produce NAN
         genus_series = pd.Series(genus)
         csv.insert(loc=0, column='genus', value=genus_series.values)
-        print(csv[csv['genus'].isin(nan_list)]["genus"])  # print everything that didn't work with pytaxonkit
-        # print(taxonomy[taxonomy["TaxID"].isna()])  # print everything that didn't worked with pytaxonkit (old)
+        # print(csv[csv['genus'].isin(nan_list)]["genus"])  # print everything that didn't work with pytaxonkit
         total_chr = len(genus)
         chr_not_work = len(taxonomy[taxonomy["TaxID"].isna()])
         chr_work = total_chr - chr_not_work
         print("reference tested:", input_file)
         print(total_chr, "total chromosomes,", chr_work, "chromosomes were OK,", chr_not_work, "Did not work")
         print(chr_work / total_chr, "of the reference works,", chr_not_work / total_chr, "Did not work")
-        print("")
-    # print(result[['TaxID', 'Name', 'Lineage']])
+        if len(genus) == len(filtered_csv):
+            print("The input and the output for lineage are the same. Filtering has probably worked.")
+        else:
+            print("The input is", len(genus), "organisms long. The output is", len(filtered_csv),
+                  "long. In the process of getting taxid, lineage and filtering something must have gone wrong")
+            # compare the lineages in the different filter steps. Good for bug and reference testing
+            # all_steps = pd.concat((pd.Series(csv.index.values), pd.Series(genus)), axis=1, ignore_index=True)
+            # all_steps = pd.concat((all_steps, taxonomy[["Name", "TaxID"]]), axis=1, ignore_index=True)
+            # all_steps = pd.concat((all_steps, lineage["Name"]), axis=1, ignore_index=True)
+            # all_steps = pd.concat((all_steps, filtered_csv["Name"]), axis=1, ignore_index=True)
+            # all_steps.columns = ["reference_name", "filtered_genus", "name_to_Taxid_Name", "name_to_taxid_TaxID", "lineage_Name", "filtered_csv_Name"]
+            # all_steps.to_csv("compare_filter_steps.txt", index=False)
+            # print(all_steps)
 
 
 if __name__ == "__main__":

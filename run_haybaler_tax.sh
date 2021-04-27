@@ -26,9 +26,6 @@ then
     mkdir $outputDir
 fi
 
-cp $haybaler_dir/prepare_for_R_heatmap.sh $outputDir
-cp $haybaler_dir/runbatch_create_heatmap.sh $outputDir
-cp $haybaler_dir/create_heatmap.R $outputDir
 
 ##### taxonomy ######
 python3 haybaler_taxonomy.py  -i 2021_02_human_bact_fungi_vir_masked.fa.fai -p /lager2/rcug/seqres/metagenref/
