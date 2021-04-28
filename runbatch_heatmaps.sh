@@ -59,13 +59,13 @@ create_heatmaps
 mv *heatmap*.html *heatmap*.pdf top_50_taxa
 
 # Create heatmaps with all taxa
-if [ ! -d "all_taxa" ]
+if [ ! -d "top_200_taxa" ]
 	then
-	mkdir all_taxa
+	mkdir top_200_taxa
 fi
 # Run bash function for all taxa
-prepare_files 10000000 # number of taxa is set so high its like all taxa, no sample should have more taxa
+prepare_files 200 # number of taxa is set so high its like all taxa, no sample should have more taxa
 create_heatmaps
-mv *heatmap*.html *heatmap*.pdf all_taxa
+mv *heatmap*.html *heatmap*.pdf top_200_taxa
 
 echo "INFO: Script completed"
