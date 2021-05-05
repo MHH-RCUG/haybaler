@@ -27,6 +27,26 @@ then
 fi
 
 
+# for samples
+count=`ls -1 *haybaler.csv 2>/dev/null | wc -l`
+if [ $count != 0 ]
+    then
+    for csv in $(ls *haybaler.csv)
+    do
+      python3 haybaler_taxonomy.py -i $csv -p .
+    done
+fi
+
+# uncomment the next section for testing references
+count=`ls -1 *fa*.fai 2>/dev/null | wc -l`
+if [ $count != 0 ]
+    then
+    for fai in $(ls *fa*.fai)
+    do
+      python3 haybaler_taxonomy.py -i $fai -p . -t True
+    done
+fi
+
 ##### taxonomy ######
-python3 haybaler_taxonomy.py  -i 2021_02_human_bact_fungi_vir_masked.fa.fai -p /lager2/rcug/seqres/metagenref/
+# python3 haybaler_taxonomy.py  -i 2021_02_human_bact_fungi_vir_masked.fa.fai -p /lager2/rcug/seqres/metagenref/
 

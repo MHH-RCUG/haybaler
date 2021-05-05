@@ -1,5 +1,5 @@
 # Haybaler
-# Sophia Poertner, Nov 2020 - Feb 2021
+# Sophia Poertner, Nov 2020 - April 2021
 
 # Combine your Wochenende .bam.txt or reporting output from multiple samples into one matrix per stat.
 # Usage: bash run_haybaler.sh
@@ -7,12 +7,14 @@
 
 import pandas as pd
 import click
-import os.path
+import os
 import re
 
-version = "0.23 - Mar 2021"
+version = "0.30 - April 2021"
+
 
 # changelog
+# 0.30 read all samples in one call. Filter out taxa with values below a readcount and RPMM limit
 # 0.23 improve file input and arg handling
 # 0.22 bugfix, correct gc_ref and chr_length for new chromosomes
 # 0.21 fix ordering problems
@@ -42,7 +44,7 @@ def txt_to_df(filename, filepath):
 
 
 def join_dfs(file, name, path, column, input_name):
-    sample = (input_name[:input_name.find(".")])   # shorten sample name
+    sample = (input_name[:input_name.find(".")])  # shorten sample name
     sub_df = file[[column]].copy()  # new df with just the wanted column
     sub_df = sub_df.rename(columns={column: sample})  # rename column to sample name
     if os.path.isfile(path + "/" + column + "_" + name):  # if the file for the wanted stat already exists
@@ -118,52 +120,105 @@ def adding_species(path, column, name):
             f.write(f"species" + content)
 
 
+def get_taxa_to_exclude(file, limit, taxa_to_exclude, path):
+    reason = file.replace("_haybaler.csv", " below limit")
+    reason = reason.replace(path + "/", "")
+    df = pd.read_csv(file, decimal=",", index_col=0, sep='\t')
+    df = df.drop(['chr_length', 'gc_ref'], axis=1)
+    # check which rows have all values below the limit, add them to the "taxa_to_exclude_list"
+    taxa_to_exclude.extend(df[(df.astype('float') < limit).all(axis=1)].index)
+    # create a df with the excluded taxa and why they are excluded
+    taxa_to_exclude_index = df[(df.astype('float') < limit).all(axis=1)].index
+    taxa_to_exclude_df = pd.DataFrame(index=taxa_to_exclude_index)
+    taxa_to_exclude_df[reason] = "yes"
+    return taxa_to_exclude, taxa_to_exclude_df
+
+
+def exclude_taxa(file, path, taxa_to_exclude):
+    df = pd.read_csv(path + "/" + file, decimal=",", index_col=0, sep='\t')  # read csv
+    df = df[~df.index.isin(taxa_to_exclude)]  # exclude taxa
+    df.to_csv(path + "/" + file, sep="\t")  # save again as csv
+
+
 @click.command()
-@click.option('--input_file', '-i', help='Name of the input file', required=True)
+@click.option('--input_files', '-i', help='Name of the input file', required=True)
 @click.option('--input_path', '-p', help='Path of the input file', required=True)
 @click.option('--output_path', '-op', help='Name of the output path')
 @click.option('--output_file', '-o', help='Name of the output file')
-def main(input_file, input_path, output_path, output_file):
+@click.option('--readcount_limit', '-l', help='minimum amount of readcounts per sample. "Chromosomes with less than x '
+                                              'reads in every sample are filtered out"! Default = 10', default=10)
+@click.option('--rpmm_limit', '-r', help='minimum amount of RPMM per sample. "Chromosomes with less than x '
+                                         'RPMM in every sample are filtered out"! Default = 300', default=300)
+def main(input_files, input_path, output_path, output_file, readcount_limit, rpmm_limit):
+    list_input_files = input_files.split(";")[1:]
     # Debug prints messages on input and progress
     debug = False  # True or False
     if debug:
         print("INFO: Haybaler debug is on.")
-    try:
-        if input_file.endswith('.csv'):
-            if not re.search("rep.u*s.csv", input_file):
-                print("WARNING: Input file {0} does not match the typical file names. Only bam.txt, rep.s.csv and "
-                      "rep.us.csv work as input files.".format(input_file))
-            file = read_csv(input_file, input_path)
-            if debug:
-                print(input_file)
-        elif input_file.endswith('.txt'):
-            if not re.search("bam.txt", input_file):
-                print("WARNING: Input file {0} does not match the typical file names. Only bam.txt, rep.s.csv and "
-                      "rep.us.csv work as input files.".format(input_file))
-            file = txt_to_df(input_file, input_path)
-            if debug:
-                print(input_file)
-        else:
-            raise Exception("Inputfile {0} has the wrong file format. Only works for txt and csv".format(input_file))
-    except FileNotFoundError:
-        raise Exception("Failed to find or read input file: {0}".format(input_file))
-    except AttributeError:
-        raise Exception("No input file given. Please specify input file. Try --help for help")
-    # make an own file for each stat, so for each column in the input file (or add the stats to existing files)
-    for col in file.columns:
-        if col != "chr_length" and col != "gc_ref":  # columns which are the same in every sample. Don't need extra file
-            if debug:
-                print(col)
-            df = join_dfs(file, output_file, output_path, col, input_file)
-            if col == 'read_count':
-                df, order = find_order(df)
-            elif 'order' in locals():
-                df = sort_new(df, order)
+    for input_file in list_input_files:
+        try:
+            if input_file.endswith('.csv'):
+                if not re.search("rep.u*s.csv", input_file):
+                    print("WARNING: Input file {0} does not match the typical file names. Only bam.txt, rep.s.csv and "
+                          "rep.us.csv work as input files.".format(input_file))
+                file = read_csv(input_file, input_path)
+                if debug:
+                    print(input_file)
+            elif input_file.endswith('.txt'):
+                if not re.search("bam.txt", input_file):
+                    print("WARNING: Input file {0} does not match the typical file names. Only bam.txt, rep.s.csv and "
+                          "rep.us.csv work as input files.".format(input_file))
+                file = txt_to_df(input_file, input_path)
+                if debug:
+                    print(input_file)
             else:
-                print("Sorting process for file {0} passed. It was not possible to calculate the correct order".format
-                      (input_file))
-            df.to_csv(output_path + "/" + col + "_" + output_file, sep='\t')
-            adding_species(output_path, col, output_file)
+                raise Exception(
+                    "Inputfile {0} has the wrong file format. Only works for txt and csv".format(input_file))
+        except FileNotFoundError:
+            raise Exception("Failed to find or read input file: {0}".format(input_file))
+        except AttributeError:
+            raise Exception("No input file given. Please specify input file. Try --help for help")
+        # make an own file for each stat, so for each column in the input file (or add the stats to existing files)
+        for col in file.columns:
+            if col != "chr_length" and col != "gc_ref":  # columns which are the same in every sample. Don't need extra file
+                if debug:
+                    print(col)
+                df = join_dfs(file, output_file, output_path, col, input_file)
+                if col == 'read_count':
+                    df, order = find_order(df)
+                elif 'order' in locals():
+                    df = sort_new(df, order)
+                else:
+                    print(
+                        "Sorting process for file {0} passed. It was not possible to calculate the correct order".format
+                        (input_file))
+                df.to_csv(output_path + "/" + col + "_" + output_file, sep='\t')
+                adding_species(output_path, col, output_file)
+
+    taxa_to_exclude = []
+    excluded_taxa_readcount = None
+    excluded_taxa_RPMM = None
+    if os.path.isfile(output_path + "/" + "read_count_" + output_file):
+        taxa_to_exclude, excluded_taxa_readcount = get_taxa_to_exclude(output_path + "/" + "read_count_" + output_file,
+                                                                       readcount_limit, taxa_to_exclude, output_path)
+    if os.path.isfile(output_path + "/" + "RPMM_" + output_file):
+        taxa_to_exclude, excluded_taxa_RPMM = get_taxa_to_exclude(output_path + "/" + "RPMM_" + output_file, rpmm_limit,
+                                                                  taxa_to_exclude, output_path)
+
+    # check if the df of the excluded taxa from readcount and RPMM exist, concat them if both do
+    if excluded_taxa_readcount is not None and excluded_taxa_RPMM is not None:
+        excluded_taxa_df = pd.concat([excluded_taxa_readcount, excluded_taxa_RPMM], axis=1)
+    elif excluded_taxa_readcount is not None and excluded_taxa_RPMM is None:
+        excluded_taxa_df = excluded_taxa_readcount
+    elif excluded_taxa_readcount is None and excluded_taxa_RPMM is not None:
+        excluded_taxa_df = excluded_taxa_RPMM
+    else:
+        excluded_taxa_df = pd.DataFrame()
+    excluded_taxa_df.fillna("no", inplace=True)
+    excluded_taxa_df.to_csv(output_path + "/excluded_taxa.csv", sep="\t")  # save the df with the excluded taxa and the reason
+    for haybaler_csv in os.listdir(output_path):
+        if haybaler_csv.endswith(output_file):
+            exclude_taxa(haybaler_csv, output_path, taxa_to_exclude)  # exclude the taxa from the haybaler.csv
 
 
 if __name__ == '__main__':
