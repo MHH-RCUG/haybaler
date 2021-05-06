@@ -63,7 +63,10 @@ size_columns <- 0.6
 
 # 50 taxa is the reference. The proportion to 50 taxa is calculate to adjust the size of the pdf 
 num_taxa <- nrow(your_data_2)
-heatmap_size <- num_taxa / 50 
+heatmap_size <- num_taxa / 50
+if(heatmap_size < 1){
+        heatmap_size <- 1
+}
 
 # Set the working directory
 setwd(directory)
