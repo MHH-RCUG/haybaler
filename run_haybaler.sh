@@ -13,7 +13,7 @@ haybaler_directory="/mnt/ngsnfs/tools/dev/haybaler/"
 
 
 # Users: don't modify this section
-if [ -z "$1" ]
+if [[ -z "$1" ]]
 then
   haybaler_dir=$haybaler_directory
 else
@@ -21,7 +21,7 @@ else
 fi
 
 outputDir=haybaler_output
-if [ ! -d $outputDir ]
+if [[ ! -d $outputDir ]]
 then
     echo "INFO: Creating directory:" $outputDir
     mkdir $outputDir
@@ -34,7 +34,7 @@ input_files=""
 
 # Only run for *bam*.csv if files exist in current dir
 count=`ls -1 *.bam*.csv 2>/dev/null | wc -l`
-if [ $count != 0 ]
+if [[ $count != 0 ]]
     then
     for csv in $(ls *.bam*.csv)
     do
@@ -45,7 +45,7 @@ fi
 
 # Only run for *bam*.txt if files exist in current dir
 count=`ls -1 *.bam*.txt 2>/dev/null | wc -l`
-if [ $count != 0 ]
+if [[ $count != 0 ]]
     then
     for csv in $(ls *.bam*.txt)
     do
