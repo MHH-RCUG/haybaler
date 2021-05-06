@@ -50,25 +50,25 @@ done
 
 
 # Create heatmaps with 50 taxa
-if [ ! -d "top_50_taxa" ]
+if [[ ! -d "top_50_taxa" ]]
         then
 	mkdir top_50_taxa
 fi
 # Run bash function for 50 taxa
 prepare_files 50
 create_heatmaps
-if [ $count_pdf != 0 ]
+if [[ $count_pdf != 0 ]]
     then
     mv *heatmap*.pdf top_50_taxa
 fi
-if [ $count_html != 0 ]
+if [[ $count_html != 0 ]]
     then
     mv *heatmap*.html top_50_taxa
 fi
 
 
 # Create heatmaps with 200 taxa
-if [ ! -d "top_200_taxa" ]
+if [[ ! -d "top_200_taxa" ]]
 	then
 	mkdir top_200_taxa
 fi
@@ -77,11 +77,11 @@ prepare_files 200
 create_heatmaps
 count_html=`ls -1 *heatmap*.html 2>/dev/null | wc -l`
 count_pdf=`ls -1 *heatmap*.pdf 2>/dev/null | wc -l`
-if [ $count_pdf != 0 ]
+if [[ $count_pdf != 0 ]]
     then
     mv *heatmap*.pdf top_200_taxa
 fi
-if [ $count_html != 0 ]
+if [[ $count_html != 0 ]]
     then
     mv *heatmap*.html top_200_taxa
 fi
