@@ -2,7 +2,7 @@
 # Sophia Poertner
 # Run haybaler https://github.com/MHH-RCUG/haybaler/
 
-version=0.10
+version=0.20
 echo "Starting Haybaler, run_haybaler.sh version" $version
 
 # set directory to get the haybaler heatmaps scripts from

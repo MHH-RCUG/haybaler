@@ -12,6 +12,8 @@
 - one file per sample containing all results -> one file per result type containing all samples
 - Less files, easy to compare different samples
 - The haybaler output is ordered by read count: the organisms/chromosome with the highest read count over all samples will be at the top of the haybaler output file
+- per default filters out every chromosome with less than 10 Reads or less than 300 RPMM in every sample
+- excluded taxa are saved (with the reason) in a separate file excluded_taxa.csv
 - Scripts allow data preparation for heatmaps and further analyses in R.
 
 
@@ -40,6 +42,16 @@ bash run_haybaler.sh
 # This will run haybaler as one step
 ```
 
+#### change read_count or RPMM limit
+- default: readcount_limit: 10, rpmm_limit = 300
+- open file run_haybaler.sh, edit last line
+- add –readcount_limit xx
+- add –rpmm_limit xx
+```
+# example with readcount_limit 20 and rpmm_limit 200
+python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --readcount_limit 20 --rpmm_limit 200
+```
+ 
 ### Output
 
 The output is in the created output folder, default haybaler_output
@@ -51,17 +63,14 @@ Output is a set of CSVs. These combine the results from the original files into 
 
 You can read the output into R for example and do further analyses yourself, or use our heatmap scripts
 - exclude mouse, human, mito
-- heatmap for the top x organisms (default 50 taxa in version 0.16)
+- heatmap for the top x organisms (default 50 and 200 taxa in version 0.16)
 - use both base R heatmap and heatmaply heatmaps
 - display raw and square-rooted results
 
 ```
 # go to the haybaler output file
-# First prepare the data for a heatmap
-prepare_for_R_heatmap.sh  
-
 # Now run the Rscript to create a heatmap, this requires an R installation.
 # Because of a bug with heatmaply and conda, no conda enviroment is allowed to be activated
 conda deactivate
-runbatch_create_heatmap.sh  
+bash runbatch_heatmaps.sh 
 ```
