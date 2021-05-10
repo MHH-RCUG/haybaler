@@ -13,7 +13,7 @@
 - Less files, easy to compare different samples
 - The haybaler output is ordered by read count: the organisms/chromosome with the highest read count over all samples will be at the top of the haybaler output file
 - per default filters out every chromosome with less than 10 Reads or less than 300 RPMM in every sample
-- excluded taxa are saved in a seperat excluded_taxa.csv
+- excluded taxa are saved (with the reason) in a separate file excluded_taxa.csv
 - Scripts allow data preparation for heatmaps and further analyses in R.
 
 
