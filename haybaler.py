@@ -121,7 +121,7 @@ def adding_species(path, column, name):
 
 
 def get_taxa_to_exclude(file, limit, taxa_to_exclude, path):
-    reason = file.replace("_haybaler.csv", " below limit")
+    reason = file.replace("_haybaler.csv", "_below_" + str(limit))
     reason = reason.replace(path + "/", "")
     df = pd.read_csv(file, decimal=",", index_col=0, sep='\t')
     df = df.drop(['chr_length', 'gc_ref'], axis=1)
@@ -216,6 +216,12 @@ def main(input_files, input_path, output_path, output_file, readcount_limit, rpm
         excluded_taxa_df = pd.DataFrame()
     excluded_taxa_df.fillna("no", inplace=True)
     excluded_taxa_df.to_csv(output_path + "/excluded_taxa.csv", sep="\t")  # save the df with the excluded taxa and the reason
+    # when concating two df's, the value species gets lost, so it needs to be added afterwards
+    with open(output_path + "/excluded_taxa.csv", 'r+') as f:
+        content = f.read()
+        if not content.split()[0] == "species":
+            f.seek(0, 0)
+            f.write(f"species" + content)
     for haybaler_csv in os.listdir(output_path):
         if haybaler_csv.endswith(output_file):
             exclude_taxa(haybaler_csv, output_path, taxa_to_exclude)  # exclude the taxa from the haybaler.csv
