@@ -1,9 +1,11 @@
 #!/bin/bash
 ## run on server hpc-bc15-07
 
-# Prepare data for R heattrees
+# Input data: requires tables output by haybaler_taxonomy.R https://github.com/MHH-RCUG/haybaler
+# First run Wochenende, then haybaler_taxonomy.sh
 # exclude GC, ref length, any host chr etc
 # Sophia Poertner, Colin Davenport, 2020-2021
+# Usage: bash run_heattrees.sh 
 
 
 prepare_files () {
@@ -96,4 +98,4 @@ if [[ $bphc_count_background_pdf != 0 ]]
     mv bacteria_per_human_cell*background_heattree.pdf bphc_background_heattrees
 fi
 
-echo "INFO: Heattree script completed"
+echo "INFO: Heat tree script completed"
