@@ -1,4 +1,5 @@
 # Script to create heattrees out of haybaler output with Metadata. 
+# This is just a template, not an automated script, and will need to be modified before use. 
 # Author: Sophia Poertner, April - May 2021
 
 ## checks if required packages are installed, install if not. Then load all packages
@@ -19,6 +20,8 @@ invisible(lapply(packages, library, character.only = TRUE))
 path = "."                             # Path to your data, default current dir "."
 directory = "."                        # directory you want the heatmap to be saved in ("." is current dir)
 filename <- "RPMM_filt2_heattree.csv"  # name of your file
+# change the file and name to the matadata you want
+metadata_name <- "/mnt/ngsnfs/gen/rcug_lw/sophias_projekte/haybaler/heat_trees/Metadata.csv"
 
 ## column with the lineage information. Uncomment one
 # wanted_column <- "genus_lineage"
@@ -49,8 +52,6 @@ input_taxmap <- parse_tax_data(input_file,
 # Grouped with metadata
 # !!! make sure that the samples name in "input_file" and "meatadata" are the same !!!
 
-# change the file and name to the matadata you want
-metadata_name <- "/mnt/ngsnfs/gen/rcug_lw/sophias_projekte/haybaler/heat_trees/Metadata.csv"
 metadata <- read.csv(file = metadata_name, sep = ";")
 
 # shorten names from input_file, just as test (can be done before reading data in or in R)
