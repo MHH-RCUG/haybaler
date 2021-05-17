@@ -15,7 +15,7 @@ if [[ $(hostname) == $server ]]
         then
         echo "INFO: Found hostname $server. OK. Will attempt to run heat trees here"
 else
-                echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server. We can't run heat trees here!"
+        echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server. We can't run heat trees here!"
 fi
 
 
@@ -38,34 +38,34 @@ prepare_files () {
 create_heattrees () {
   echo "INFO: Starting batch heat-tree creation"
 
-# check for rscript, exit if unavailable
-rscript_bin="/usr/bin/Rscript"
-if [[ ! -f $rscript_bin ]]
+    # check for rscript, exit if unavailable
+    rscript_bin="/usr/bin/Rscript"
+    if [[ ! -f $rscript_bin ]]
+            then
+            echo "INFO: Rscript binary not found, aborting. Could not find this, is R installed? " $rscript_bin
+            exit
+    fi
+    echo "INFO: Using rscript binary: " $rscript_bin
+
+
+    # create heat-tree for each heatmap.csv file
+    # check if correct files present
+    count=$(ls -1 *filt2_heattree.csv 2>/dev/null | wc -l)
+    if [[ $count != 0 ]]
         then
-        echo "INFO: Rscript binary not found, aborting. Could not find this, is R installed? " $rscript_bin
-        exit
-fi
-echo "INFO: Using rscript binary: " $rscript_bin
+        for heattreecsv in {RPMM,bacteria_per_human_cell}*filt2_heattree.csv
+            do
+            echo "INFO: Creating heat-tree for file: $heattreecsv"
+            # run local
+            $rscript_bin create_heattrees.R "$heattreecsv"
+        done
+    else
+        echo "Could not find heat-tree input files of type filt2_heattree.csv in the directory"
+    fi
+}
 
 
-# create heat-tree for each heatmap.csv file
-# check if correct files present
-count=$(ls -1 *filt2_heattree.csv 2>/dev/null | wc -l)
-if [[ $count != 0 ]]
-    then
-    for heattreecsv in {RPMM,bacteria_per_human_cell}*filt2_heattree.csv
-    do
-        echo "INFO: Creating heat-tree for file: $heattreecsv"
-        # run local
-        $rscript_bin create_heattrees.R "$heattreecsv"
-    done
-else
-	echo "Could not find heat-tree input files of type *filt2_heattree.csv in the directory"
-fi
-
-
-
-echo "INFO: run this script only on $server"
+echo "INFO: run this script only on: $server"
 
 prepare_files
 create_heattrees
