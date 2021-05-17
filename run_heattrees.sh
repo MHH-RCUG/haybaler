@@ -8,6 +8,18 @@
 # Usage: bash run_heattrees.sh 
 
 
+# Run only on certain server
+server=hpc-bc15-07
+#server=hpc06
+if [[ $(hostname) == $server ]]
+        then
+        echo "INFO: Found hostname $server. OK. Will attempt to run heat trees here"
+else
+                echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server. We can't run heat trees here!"
+fi
+
+
+
 prepare_files () {
   echo "INFO: Preparing files for R heatmap creation"
   for infile in {RPMM,bacteria_per_human_cell}*haybaler_taxa.csv
@@ -24,7 +36,7 @@ prepare_files () {
 
 
 create_heattrees () {
-  echo "INFO: Starting batch heattree creation"
+  echo "INFO: Starting batch heat-tree creation"
 
 # check for rscript, exit if unavailable
 rscript_bin="/usr/bin/Rscript"
@@ -35,17 +47,25 @@ if [[ ! -f $rscript_bin ]]
 fi
 echo "INFO: Using rscript binary: " $rscript_bin
 
-# create heattree for each heatmap.csv file
-for heattreecsv in {RPMM,bacteria_per_human_cell}*filt2_heattree.csv
-        do
-        echo "INFO: Creating heattree for file: $heattreecsv"
+
+# create heat-tree for each heatmap.csv file
+# check if correct files present
+count=$(ls -1 *filt2_heattree.csv 2>/dev/null | wc -l)
+if [[ $count != 0 ]]
+    then
+    for heattreecsv in {RPMM,bacteria_per_human_cell}*filt2_heattree.csv
+    do
+        echo "INFO: Creating heat-tree for file: $heattreecsv"
         # run local
         $rscript_bin create_heattrees.R "$heattreecsv"
-done
-}
+    done
+else
+	echo "Could not find heat-tree input files of type *filt2_heattree.csv in the directory"
+fi
 
 
-echo "INFO: run this script only on hpc-bc15-07!"
+
+echo "INFO: run this script only on $server"
 
 prepare_files
 create_heattrees
@@ -72,7 +92,7 @@ if [[ ! -d "bphc_no_background_heattrees" ]]
 	mkdir bphc_no_background_heattrees
 fi
 
-# move heattrees in directories
+# move heat-trees in directories
 RPMM_count_no_background_pdf=$(ls -1 RPMM_*no_background_heattree.pdf 2>/dev/null | wc -l)
 if [[ $RPMM_count_no_background_pdf != 0 ]]
     then
@@ -92,7 +112,7 @@ if [[ $bphc_count_no_background_pdf != 0 ]]
     mv bacteria_per_human_cell*no_background_heattree.pdf bphc_no_background_heattrees
 fi
 
-bphc_count_background_pdf=$(ls -1 bacteria_per_human_cell*background_heattree.pdf 2>/dev/null | wc -)
+bphc_count_background_pdf=$(ls -1 bacteria_per_human_cell*background_heattree.pdf 2>/dev/null | wc -l)
 if [[ $bphc_count_background_pdf != 0 ]]
     then
     mv bacteria_per_human_cell*background_heattree.pdf bphc_background_heattrees

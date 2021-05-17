@@ -10,6 +10,9 @@ echo "Starting Haybaler, run_haybaler.sh version" $version
 
 # Users: change this to your haybaler path
 haybaler_directory="/mnt/ngsnfs/tools/dev/haybaler/"
+# Change this to your existing conda env
+. /mnt/ngsnfs/tools/miniconda3/etc/profile.d/conda.sh
+conda activate haybaler
 
 
 # Users: don't modify this section
