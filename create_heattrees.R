@@ -106,7 +106,7 @@ for(sample in samples) {
             node_color = one_sample_taxmap$data$tax_abund[[sample]],
             node_color_axis_label = "RPMM"
   )
-  output_pdf = paste0(filename,"_",sample,"_no_backgound_heattree.pdf")
+  output_pdf = paste0(filename,"_",sample,"_no_background_heattree.pdf")
   ggsave(output_pdf, plot=plot, device = "pdf")
 }
 
