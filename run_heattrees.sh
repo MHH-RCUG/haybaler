@@ -1,10 +1,9 @@
 #!/bin/bash
-## run on server hpc-bc15-07
-
 # Input data: requires tables output by haybaler_taxonomy.R https://github.com/MHH-RCUG/haybaler
-# First run Wochenende, then haybaler_taxonomy.sh
+# First run Wochenende, then wochenende_postprocess.sh. (or haybaler_taxonomy.sh manually) 
 # exclude GC, ref length, any host chr etc
 # Sophia Poertner, Colin Davenport, 2020-2021
+# Installation: First prepare server with R packages, see https://github.com/MHH-RCUG/haybaler
 # Usage: bash run_heattrees.sh 
 
 
@@ -49,7 +48,7 @@ create_heattrees () {
 
 
     # create heat-tree for each heatmap.csv file
-    # check if correct files present
+    # check if correct files present, else do not run the script, which would create empty files.
     count=$(ls -1 *filt2_heattree.csv 2>/dev/null | wc -l)
     if [[ $count != 0 ]]
         then
