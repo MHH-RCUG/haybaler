@@ -1,6 +1,8 @@
 #!/bin/bash
 # Sophia Poertner
-# Run haybaler https://github.com/MHH-RCUG/haybaler/
+# Run haybaler taxonomy to attribute NCBI taxonomic lineage to Haybaler output files *haybaler.csv in the current dir. See https://github.com/MHH-RCUG/haybaler/
+# Usage: bash run_haybaler_tax.sh
+
 
 echo "Starting Haybaler taxonomy"
 
@@ -22,13 +24,6 @@ else
   haybaler_dir="$1"
 fi
 
-outputDir=haybaler_output
-if [[ ! -d $outputDir ]]
-then
-    echo "INFO: Creating directory:" $outputDir
-    mkdir $outputDir
-fi
-
 
 # for samples
 count=`ls -1 *haybaler.csv 2>/dev/null | wc -l`
@@ -40,7 +35,8 @@ if [[ $count != 0 ]]
     done
 fi
 
-# uncomment the next section for testing references
+
+# uncomment the next section for testing references (just for developers!)
 count=`ls -1 *fa*.fai 2>/dev/null | wc -l`
 if [[ $count != 0 ]]
     then
@@ -49,7 +45,6 @@ if [[ $count != 0 ]]
       python3 haybaler_taxonomy.py -i $fai -p . -t True
     done
 fi
-
 ##### taxonomy ######
 # python3 haybaler_taxonomy.py  -i 2021_02_human_bact_fungi_vir_masked.fa.fai -p /mnt/ngsnfs/seqres/metagenref/
 
