@@ -2,7 +2,7 @@
 # Sophia Poertner
 # Run haybaler https://github.com/MHH-RCUG/haybaler/
 
-version=0.20
+version="0.21, May 2021"
 echo "Starting Haybaler, run_haybaler.sh version" $version
 
 # set directory to get the haybaler heatmaps scripts from
@@ -10,6 +10,9 @@ echo "Starting Haybaler, run_haybaler.sh version" $version
 
 # Users: change this to your haybaler path
 haybaler_directory="/mnt/ngsnfs/tools/dev/haybaler/"
+# Change this to your existing conda env
+. /mnt/ngsnfs/tools/miniconda3/etc/profile.d/conda.sh
+conda activate haybaler
 
 
 # Users: don't modify this section
@@ -27,8 +30,11 @@ then
     mkdir $outputDir
 fi
 
+cp $haybaler_dir/*.py $outputDir
 cp $haybaler_dir/runbatch_heatmaps.sh $outputDir
 cp $haybaler_dir/create_heatmap.R $outputDir
+cp $haybaler_dir/run_heattrees.sh $outputDir
+cp $haybaler_dir/run_haybaler_tax.sh $outputDir
 
 input_files=""
 

@@ -23,7 +23,7 @@ filename <-args[6]   # name of file of your data
 
 cmd_msg = "File to process: "
 cmd_msg
-file
+filename
 
 path = "."              # Path to your data, default current dir "."
 directory = "."         # directory you want the heatmap to be saved in ("." is current dir)
@@ -50,6 +50,7 @@ input_taxmap <- parse_tax_data(input_file,
                        class_key = "taxon_name"
 )
 
+data_type <- str_replace(filename, "_filt2_heattree.csv", "")   # RPMM or bacteria_per_human_cell
 
 # all samples sums
 
@@ -63,7 +64,7 @@ plot <- heat_tree(input_taxmap,
                   node_label = taxon_names(input_taxmap),
                   node_size = input_taxmap$data$tax_abund$sums,
                   node_color =  input_taxmap$data$tax_abund$sums,
-                  node_color_axis_label = "RPMM"
+                  node_color_axis_label = data_type
 )
 output_pdf = paste0(filename,"_all_samples_heattree.pdf")
 ggsave(output_pdf, plot=plot, device = "pdf")
@@ -78,7 +79,7 @@ for(sample in samples) {
             node_label = taxon_names(input_taxmap),
             node_size = input_taxmap$data$tax_abund[[sample]],
             node_color =  input_taxmap$data$tax_abund[[sample]],
-            node_color_axis_label = "RPMM"
+            node_color_axis_label = data_type
   )
   output_pdf = paste0(filename,"_",sample,"_background_heattree.pdf")
   ggsave(output_pdf, plot=plot, device = "pdf")
@@ -104,9 +105,9 @@ for(sample in samples) {
             node_label = one_sample_taxmap$taxon_names(),
             node_size = one_sample_taxmap$data$tax_abund[[sample]],
             node_color = one_sample_taxmap$data$tax_abund[[sample]],
-            node_color_axis_label = "RPMM"
+            node_color_axis_label = data_type
   )
-  output_pdf = paste0(filename,"_",sample,"_no_backgound_heattree.pdf")
+  output_pdf = paste0(filename,"_",sample,"_no_background_heattree.pdf")
   ggsave(output_pdf, plot=plot, device = "pdf")
 }
 
