@@ -20,7 +20,7 @@ elif [[ $(hostname) == $server2 ]]
         then
         echo "INFO: Found hostname $server2. OK. Will attempt to run heat trees here"
 else
-        echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server. We can't run heat trees here!"
+        echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server1. We can't run heat trees here!"
 fi
 
 prepare_files () {
