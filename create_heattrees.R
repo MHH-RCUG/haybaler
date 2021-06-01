@@ -34,8 +34,6 @@ wanted_column <- "species_lineage"
 
 # check if wanted column exists
 input_file <- read.csv(file = filename, sep = "\t")
-
-
 if(!(wanted_column %in% colnames(input_file))){
   stop("The wanted column for lineage does not exist.")
 }
