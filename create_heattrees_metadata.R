@@ -28,7 +28,7 @@ metadata_name <- "/mnt/ngsnfs/gen/rcug_lw/sophias_projekte/haybaler/heat_trees/M
 wanted_column <- "species_lineage"
 
 # check if wanted column exists
-input_file <- read.csv(file = paste0(path,"/",filename), sep = "\t")
+input_file <- read_delim(filename, "\t", escape_double = FALSE, trim_ws = TRUE)
 if(!(wanted_column %in% colnames(input_file))){
   stop("The wanted column for lineage does not exist.")
 }
@@ -52,18 +52,18 @@ input_taxmap <- parse_tax_data(input_file,
 # Grouped with metadata
 # !!! make sure that the samples name in "input_file" and "meatadata" are the same !!!
 
-metadata <- read.csv(file = metadata_name, sep = ";")
+metadata <- read_delim(metadata_name, ";", escape_double = FALSE, trim_ws = TRUE)
 
 # shorten names from input_file, just as test (can be done before reading data in or in R)
 colnames(input_taxmap$data$tax_data) <- str_extract(colnames(input_taxmap$data$tax_data), "X19_....|Blank_......|lineage|taxon_id")
 
 col_names <- colnames(input_taxmap$data$tax_data)  # sample names in input_file
-metadata <- metadata[metadata$X %in% col_names ,]  # filter out samples which are not in the input_file
+metadata <- metadata[metadata$X1 %in% col_names ,]  # filter out samples which are not in the input_file
 group <- "delivery"  # column name of group
 
 # calc abundance for subgroups in group
 input_taxmap$data$tax_abund_grouped <- calc_taxon_abund(input_taxmap, "tax_data",
-                                                        cols = metadata$X,
+                                                        cols = metadata$X1,
                                                         groups = metadata[[group]])
 # get the names of the subgroups
 sub_groups <- colnames(input_taxmap$data$tax_abund_grouped[, -1])
