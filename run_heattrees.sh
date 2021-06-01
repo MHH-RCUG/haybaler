@@ -23,8 +23,6 @@ else
         echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server. We can't run heat trees here!"
 fi
 
-
-
 prepare_files () {
   echo "INFO: Preparing files for R heatmap creation"
   for infile in {RPMM,bacteria_per_human_cell}*haybaler_taxa.csv
@@ -70,7 +68,7 @@ create_heattrees () {
 }
 
 
-echo "INFO: run this script only on: $server"
+echo "INFO: run this script only on: $server1 or $server2"
 
 prepare_files
 create_heattrees
