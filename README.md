@@ -64,7 +64,7 @@ Output is a set of CSVs. These combine the results from the original files into 
 You can read the output into R for example and do further analyses yourself, or use our heatmap and heattree scripts.
 Heatmaps and Heattrees are also generated with the postprocess script.
 
-#### Heatmaps
+### Heatmaps
 - exclude mouse, human, mito
 - heatmap for the top x organisms (default 50 and 200 taxa in version 0.16)
 - use both base R heatmap and heatmaply heatmaps
@@ -78,7 +78,7 @@ conda deactivate
 bash runbatch_heatmaps.sh 
 ```
 
-#### Heattrees
+### Heattrees
 - Get taxonomy
 - Needs taxonkit Datasets installed https://bioinf.shenwei.me/taxonkit/#dataset
 ```
@@ -91,6 +91,8 @@ conda activate haybaler
 bash run_haybaler_tax.sh
 ```
 - Create Heattrees for RPMM and bacteria_per_human_cell files
+- needs R installation
+- Needs Metacoder package installed (makes troubble installing it, better try it before running the script)
 - exclude mouse, human and mito
 - one heattree for the sums of all sample
 - one heattree for each sample with the sums as "background"
@@ -103,3 +105,15 @@ cp ../create_heattrees.R ../run_heattrees.sh
 # run the scripts. Needs R installation 
 bash run_heattrees.sh
 ```
+#### change the level (genus or species) for the heattrees
+
+- edit the create_heattrees.R Script
+
+```
+# go to line 31
+## column with the lineage information. Uncomment one
+# wanted_column <- "genus_lineage"
+wanted_column <- "species_lineage"
+```
+
+

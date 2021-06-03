@@ -1,23 +1,27 @@
 #!/bin/bash
 # Input data: requires tables output by haybaler_taxonomy.R https://github.com/MHH-RCUG/haybaler
-# First run Wochenende, then wochenende_postprocess.sh. (or haybaler_taxonomy.sh manually) 
+# First run Wochenende, then wochenende_postprocess.sh. (or haybaler_taxonomy.sh manually)
 # exclude GC, ref length, any host chr etc
 # Sophia Poertner, Colin Davenport, 2020-2021
 # Installation: First prepare server with R packages, see https://github.com/MHH-RCUG/haybaler
-# Usage: bash run_heattrees.sh 
+# Usage: bash run_heattrees.sh
 
 
 # Run only on certain server
-server=hpc-bc15-07
-#server=hpc06
-if [[ $(hostname) == $server ]]
+server1=hpc-bc15-07
+server2=hpc-bc15-12
+#server3=hpc06
+
+
+if [[ $(hostname) == $server1 ]]
         then
-        echo "INFO: Found hostname $server. OK. Will attempt to run heat trees here"
+        echo "INFO: Found hostname $server1. OK. Will attempt to run heat trees here"
+elif [[ $(hostname) == $server2 ]]
+        then
+        echo "INFO: Found hostname $server2. OK. Will attempt to run heat trees here"
 else
-        echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server. We can't run heat trees here!"
+        echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server1. We can't run heat trees here!"
 fi
-
-
 
 prepare_files () {
   echo "INFO: Preparing files for R heatmap creation"
@@ -64,7 +68,7 @@ create_heattrees () {
 }
 
 
-echo "INFO: run this script only on: $server"
+echo "INFO: run this script only on: $server1 or $server2"
 
 prepare_files
 create_heattrees

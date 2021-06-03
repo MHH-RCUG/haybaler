@@ -2,13 +2,13 @@
 # one heattree for the sums of all sample
 # one heattree for each sample with the sums as "background"
 # one heattree for each sample without "background"
-# Author: Sophia Poertner, April - May 2021
+# Author: Sophia Poertner, April - June 2021
 
 
 ## check if required packages are installed, install if not. Then load all packages
 
 # packages
-packages = c("metacoder", "taxa", "dplyr", "tibble", "ggplot2")
+packages = c("metacoder", "taxa", "dplyr", "tibble", "ggplot2","stringr","RColorBrewer")
 
 # install uninstalled packages
 not_installed <- packages[!(packages %in% installed.packages()[ , "Package"])]  # Extract not installed packages
@@ -93,6 +93,13 @@ for(sample in samples) {
   one_sample <- input_file %>% 
   select(lineage, all_of(sample))
   one_sample <- one_sample[one_sample[[sample]] > 0,]
+  
+  
+  #check if dataframe is empty. skip iteration if so, else a Error would occur
+  if (dim(one_sample)[1] == 0) {
+    print(paste0("empty sample. Skip heattree creation for sample ", sample))
+    next
+  }
   
   one_sample_taxmap <- parse_tax_data(one_sample,
                                     class_cols = "lineage", # the column that contains taxonomic information
