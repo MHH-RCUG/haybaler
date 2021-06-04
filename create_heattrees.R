@@ -19,11 +19,11 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # Check and set ulimits in R (TEST). Bash setting might be sufficient
 #check Cstack size
-Cstack_info()["size"]
+#Cstack_info()["size"]
 #set 32GB
 system("ulimit -s 32384")
 #check parameter is bigger
-Cstack_info()["size"]
+#Cstack_info()["size"]
 
 
 # args
