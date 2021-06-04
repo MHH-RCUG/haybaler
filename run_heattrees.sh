@@ -38,11 +38,15 @@ prepare_files () {
         do
         echo "Running on " "$infile"
 
-        #exclude mouse, human, mito
-        grep -v "^chr" "$infile" | grep -v "^1_1_1" > "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv
+        count_infile=$(ls -1 $infile 2>/dev/null | wc -l)
+        if [[ $count_infile != 0 ]]
+            then
+            #exclude mouse, human, mito
+            grep -v "^chr" "$infile" | grep -v "^1_1_1" > "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv
 
-        # using tab delimiters, cut a max of 2000 columns out excluding cols 2-3.
-        cut -f1,4-2000 "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv  > "${infile%_haybaler_taxa.csv}"_filt2_heattree.csv
+            # using tab delimiters, cut a max of 2000 columns out excluding cols 2-3.
+            cut -f1,4-2000 "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv  > "${infile%_haybaler_taxa.csv}"_filt2_heattree.csv
+        fi
   done
 }
 
@@ -62,7 +66,7 @@ create_heattrees () {
 
     # create heat-tree for each heatmap.csv file
     # check if correct files present, else do not run the script, which would create empty files.
-    count=$(ls -1 *filt2_heattree.csv 2>/dev/null | wc -l)
+    count=$(ls -1 {RPMM,bacteria_per_human_cell}*filt2_heattree.csv 2>/dev/null | wc -l)
     if [[ $count != 0 ]]
         then
         for heattreecsv in {RPMM,bacteria_per_human_cell}*filt2_heattree.csv
