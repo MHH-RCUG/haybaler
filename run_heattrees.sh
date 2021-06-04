@@ -13,12 +13,15 @@ server2=hpc-bc15-12
 server3=hpc06
 
 
-if [[ $(hostname) == $server1 ]]
+if [[ $(hostname) == $server1 || $(hostname) == $server2 || $(hostname) == $server3 ]]
         then
-        echo "INFO: Found hostname $server1. OK. Will attempt to run heat trees here"
-elif [[ $(hostname) == $server2 ]]
-        then
-        echo "INFO: Found hostname $server2. OK. Will attempt to run heat trees here"
+        echo "INFO: Found hostname $(hostname). OK. Will attempt to run heat trees here"
+#elif [[ $(hostname) == $server2 ]]
+#        then
+#        echo "INFO: Found hostname $server2. OK. Will attempt to run heat trees here"
+#elif [[ $(hostname) == $server2 ]]
+#        then
+#        echo "INFO: Found hostname $server2. OK. Will attempt to run heat trees here"
 else
         echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server1. We can't run heat trees here!"
 fi
@@ -74,7 +77,7 @@ create_heattrees () {
 }
 
 
-echo "INFO: run this script only on: $server1 or $server2"
+echo "INFO: run this script only on: $server1 or $server2 or $server3"
 
 # Actually run functions
 set_ulimits
