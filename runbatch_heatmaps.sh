@@ -15,8 +15,8 @@ prepare_files () {
         #exclude mouse, human, mito
         grep -v "^chr" $infile | grep -v "^1_1_1" > $infile.filt1.csv
 
-        # using tab delimiters, cut a max of 200 columns out excluding cols 2-3. Also restrict to number_of_taxa lines
-        cut -f1,4-200 $infile.filt1.csv | head -n $1 > $infile.filt2.csv
+        # using tab delimiters, cut a max of 2000 columns out excluding cols 2-3. Also restrict to number_of_taxa lines
+        cut -f1,4-2000 $infile.filt1.csv | head -n $1 > $infile.filt2.csv
 
         # remove _complete_genome from labels
         sed "s/_complete_genome//g" $infile.filt2.csv > $infile.filt.heatmap.csv
