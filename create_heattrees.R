@@ -17,6 +17,15 @@ if(length(not_installed)) install.packages(not_installed, repos="http://cran.rst
 #load packages
 invisible(lapply(packages, library, character.only = TRUE))
 
+# Check and set ulimits in R (TEST). Bash setting might be sufficient
+#check Cstack size
+Cstack_info()["size"]
+#set 32GB
+system("ulimit -s 32384")
+#check parameter is bigger
+Cstack_info()["size"]
+
+
 # args
 args <- commandArgs()
 filename <-args[6]   # name of file of your data

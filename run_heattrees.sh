@@ -10,7 +10,7 @@
 # Run only on certain server
 server1=hpc-bc15-07
 server2=hpc-bc15-12
-#server3=hpc06
+server3=hpc06
 
 
 if [[ $(hostname) == $server1 ]]
@@ -23,6 +23,12 @@ else
         echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server1. We can't run heat trees here!"
 fi
 
+
+set_ulimits () {
+        echo "INFO: trying to set ulimits higher from 8GB cstack to 32GB cstack"
+        ulimit -s 32384
+}
+
 prepare_files () {
   echo "INFO: Preparing files for R heatmap creation"
   for infile in {RPMM,bacteria_per_human_cell}*haybaler_taxa.csv
@@ -32,8 +38,8 @@ prepare_files () {
         #exclude mouse, human, mito
         grep -v "^chr" "$infile" | grep -v "^1_1_1" > "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv
 
-        # using tab delimiters, cut a max of 200 columns out excluding cols 2-3.
-        cut -f1,4-200 "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv  > "${infile%_haybaler_taxa.csv}"_filt2_heattree.csv
+        # using tab delimiters, cut a max of 2000 columns out excluding cols 2-3.
+        cut -f1,4-2000 "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv  > "${infile%_haybaler_taxa.csv}"_filt2_heattree.csv
   done
 }
 
@@ -70,6 +76,8 @@ create_heattrees () {
 
 echo "INFO: run this script only on: $server1 or $server2"
 
+# Actually run functions
+set_ulimits
 prepare_files
 create_heattrees
 

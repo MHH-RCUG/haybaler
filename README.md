@@ -42,7 +42,7 @@ bash run_haybaler.sh
 # This will run haybaler as one step
 ```
 
-#### change read_count or RPMM limit
+#### Set lower abundance thresholds, change readcount_limit or RPMM_limit from defaults >10 and >300
 - default: readcount_limit: 10, rpmm_limit = 300
 - open file run_haybaler.sh, edit last line
 - add –readcount_limit xx
