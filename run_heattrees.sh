@@ -90,50 +90,62 @@ create_heattrees
 
 echo "INFO: Cleanup - creating directories and moving files"
 # check if directories exist, create them if not
-if [[ ! -d "RPMM_background_heattrees" ]]
+
+if [[ ! -d "heattree_plots" ]]
         then
-	mkdir RPMM_background_heattrees
+	mkdir heattree_plots
 fi
 
-if [[ ! -d "RPMM_no_background_heattrees" ]]
+if [[ ! -d "heattree_plots/RPMM_background_heattrees" ]]
         then
-	mkdir RPMM_no_background_heattrees
+	mkdir heattree_plots/RPMM_background_heattrees
 fi
 
-if [[ ! -d "bphc_background_heattrees" ]]
+if [[ ! -d "heattree_plots/RPMM_no_background_heattrees" ]]
         then
-	mkdir bphc_background_heattrees
+	mkdir heattree_plots/RPMM_no_background_heattrees
 fi
 
-if [[ ! -d "bphc_no_background_heattrees" ]]
+if [[ ! -d "heattree_plots/bphc_background_heattrees" ]]
         then
-	mkdir bphc_no_background_heattrees
+	mkdir heattree_plots/bphc_background_heattrees
+fi
+
+if [[ ! -d "heattree_plots/bphc_no_background_heattrees" ]]
+        then
+	mkdir heattree_plots/bphc_no_background_heattrees
 fi
 
 # move heat-trees in directories
 RPMM_count_no_background_pdf=$(ls -1 RPMM_*no_background_heattree.pdf 2>/dev/null | wc -l)
 if [[ $RPMM_count_no_background_pdf != 0 ]]
     then
-    mv RPMM_*no_background_heattree.pdf RPMM_no_background_heattrees
+    mv RPMM_*no_background_heattree.pdf heattree_plots/RPMM_no_background_heattrees
 fi
 
 RPMM_count_background_pdf=$(ls -1 RPMM_*background_heattree.pdf 2>/dev/null | wc -l)
 if [[ $RPMM_count_background_pdf != 0 ]]
     then
-    mv RPMM_*background_heattree.pdf RPMM_background_heattrees
+    mv RPMM_*background_heattree.pdf heattree_plots/RPMM_background_heattrees
 fi
 
 
 bphc_count_no_background_pdf=$(ls -1 bacteria_per_human_cell*no_background_heattree.pdf 2>/dev/null | wc -l)
 if [[ $bphc_count_no_background_pdf != 0 ]]
     then
-    mv bacteria_per_human_cell*no_background_heattree.pdf bphc_no_background_heattrees
+    mv bacteria_per_human_cell*no_background_heattree.pdf heattree_plots/bphc_no_background_heattrees
 fi
 
 bphc_count_background_pdf=$(ls -1 bacteria_per_human_cell*background_heattree.pdf 2>/dev/null | wc -l)
 if [[ $bphc_count_background_pdf != 0 ]]
     then
-    mv bacteria_per_human_cell*background_heattree.pdf bphc_background_heattrees
+    mv bacteria_per_human_cell*background_heattree.pdf heattree_plots/bphc_background_heattrees
+fi
+
+count_all_samples=$(ls -1 *all_samples_heattree.pdf 2>/dev/null | wc -l)
+if [[ $bphc_count_background_pdf != 0 ]]
+    then
+    mv *all_samples_heattree.pdf heattree_plots
 fi
 
 echo "INFO: Heat tree script completed"
