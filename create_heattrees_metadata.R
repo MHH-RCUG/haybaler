@@ -36,6 +36,8 @@ if(!(wanted_column %in% colnames(input_file))){
 
 ## clean/filter data and create taxmap
 
+sample_column <- "X1"  # change to column name of the sample column, X1 if column has no name
+
 # select the wanted column and name it "lineage". Delete unwanted columns and rows
 input_file <- cbind(lineage=input_file[[wanted_column]], input_file)
 input_file <- input_file %>% select(-(matches("species|chr_length|gc_ref|genus_name|species_name|species_lineage|genus_lineage")))
@@ -50,20 +52,18 @@ input_taxmap <- parse_tax_data(input_file,
 
 
 # Grouped with metadata
-# !!! make sure that the samples name in "input_file" and "meatadata" are the same !!!
+# !!! make sure that the sample names in "input_file" and "meatadata" are the same !!!
 
 metadata <- read_delim(metadata_name, ";", escape_double = FALSE, trim_ws = TRUE)
-
-# shorten names from input_file, just as test (can be done before reading data in or in R)
-colnames(input_taxmap$data$tax_data) <- str_extract(colnames(input_taxmap$data$tax_data), "X19_....|Blank_......|lineage|taxon_id")
+data_type <- str_replace(filename, "_filt2_heattree.csv", "")   # RPMM or bacteria_per_human_cell
 
 col_names <- colnames(input_taxmap$data$tax_data)  # sample names in input_file
-metadata <- metadata[metadata$X1 %in% col_names ,]  # filter out samples which are not in the input_file
-group <- "delivery"  # column name of group
+metadata <- metadata[metadata$sample_column %in% col_names ,]  # filter out samples which are not in the input_file
+group <- "delivery"  # column name of group change to the wanted group
 
 # calc abundance for subgroups in group
 input_taxmap$data$tax_abund_grouped <- calc_taxon_abund(input_taxmap, "tax_data",
-                                                        cols = metadata$X1,
+                                                        cols = metadata$sample_column,
                                                         groups = metadata[[group]])
 # get the names of the subgroups
 sub_groups <- colnames(input_taxmap$data$tax_abund_grouped[, -1])
@@ -75,7 +75,7 @@ for (sub_group in sub_groups){
                     node_label = input_taxmap$taxon_names(),
                     node_size = input_taxmap$data$tax_abund_grouped[[sub_group]],
                     node_color = input_taxmap$data$tax_abund_grouped[[sub_group]],
-                    node_color_axis_label = "RPMM"
+                    node_color_axis_label = data_type
   )
   ggsave(output_pdf, plot=plot, device = "pdf")
 }
