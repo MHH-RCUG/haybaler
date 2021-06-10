@@ -61,7 +61,9 @@ input_taxmap <- parse_tax_data(input_file,
 
 data_type <- str_replace(filename, "_filt2_heattree.csv", "")   # RPMM or bacteria_per_human_cell
 
+#####
 # all samples sums
+#####
 
 num_cols_data <- ncol(input_taxmap$data$tax_data)
 input_taxmap$data$tax_abund <- calc_taxon_abund(input_taxmap, "tax_data", cols= 3:num_cols_data)
@@ -78,24 +80,53 @@ plot <- heat_tree(input_taxmap,
 output_pdf = paste0(filename,"_all_samples_heattree.pdf")
 ggsave(output_pdf, plot=plot, device = "pdf")
 
+#####
+# each sample with all as background
+#####
 
-# each samples with all as background
+empty_samples <- ""
+
+# # get max sample sum
+# max_col_sum <- max(colSums(input_file[,-1]))
 
 samples <- colnames(input_file[, -1])
 for(sample in samples) {
+  
+  one_sample <- input_file %>% 
+    select(lineage, all_of(sample))
+  one_sample <- one_sample[one_sample[[sample]] > 0,]
+  
+  #check if dataframe is empty. skip iteration if so, else a Error would occur
+  if (dim(one_sample)[1] == 0) {
+    print(paste0("empty sample. Skip heattree creation for sample ", sample))
+    empty_samples <- paste(empty_samples, sample, sep="\n")
+    next
+  }
+  
   set.seed(1)
   plot <- heat_tree(input_taxmap,
             node_label = taxon_names(input_taxmap),
             node_size = input_taxmap$data$tax_abund[[sample]],
             node_color =  input_taxmap$data$tax_abund[[sample]],
+            # node_size_range = c(0.01, 0.05),
+            # node_size_interval = range(c(0,max_col_sum), na.rm = TRUE, finite = TRUE),
             node_color_axis_label = data_type
   )
   output_pdf = paste0(filename,"_",sample,"_background_heattree.pdf")
   ggsave(output_pdf, plot=plot, device = "pdf")
 }
 
+write(empty_samples, paste0(path, "/empty_samples.txt"))
 
+#####
 # each sample without background
+#####
+
+empty_samples <- ""
+
+# # get max sample sum
+# max_col_sum <- max(colSums(input_file[,-1]))
+
 
 samples <- colnames(input_file[, -1])
 for(sample in samples) {
@@ -107,6 +138,7 @@ for(sample in samples) {
   #check if dataframe is empty. skip iteration if so, else a Error would occur
   if (dim(one_sample)[1] == 0) {
     print(paste0("empty sample. Skip heattree creation for sample ", sample))
+    empty_samples <- paste(empty_samples, sample, sep="\n")
     next
   }
   
@@ -121,6 +153,8 @@ for(sample in samples) {
             node_label = one_sample_taxmap$taxon_names(),
             node_size = one_sample_taxmap$data$tax_abund[[sample]],
             node_color = one_sample_taxmap$data$tax_abund[[sample]],
+            # node_size_range = c(0.01, 0.05),
+            # node_size_interval = range(c(0,max_col_sum), na.rm = TRUE, finite = TRUE),
             node_color_axis_label = data_type
   )
   output_pdf = paste0(filename,"_",sample,"_no_background_heattree.pdf")
