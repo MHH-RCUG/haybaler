@@ -45,4 +45,7 @@ if [[ $count != 0 ]]
     done
 fi
 
-python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv
+#python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv
+#testing
+python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --readcount_limit 1 --rpmm_limit 5
+
