@@ -6,23 +6,9 @@
 
 echo "Starting Haybaler taxonomy"
 
-# set directory to get the haybaler heatmaps scripts from
-# use default directory if no argument ($1) given
-
-# Users: change this to your haybaler path
-haybaler_directory="/mnt/ngsnfs/tools/dev/haybaler/" 
-# Change this to your existing conda env
-. /mnt/ngsnfs/tools/miniconda3/etc/profile.d/conda.sh
+# get conda_env from conifg_yaml. Run setup.sh and restart session
+. $conda_env
 conda activate haybaler
-
-
-# Users: don't modify this section
-if [[ -z "$1" ]]
-then
-  haybaler_dir=$haybaler_directory
-else
-  haybaler_dir="$1"
-fi
 
 
 # for samples

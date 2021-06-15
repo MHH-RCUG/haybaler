@@ -143,7 +143,7 @@ if [[ $bphc_count_background_pdf != 0 ]]
 fi
 
 count_all_samples=$(ls -1 *all_samples_heattree.pdf 2>/dev/null | wc -l)
-if [[ $bphc_count_background_pdf != 0 ]]
+if [[ $count_all_samples != 0 ]]
     then
     mv *all_samples_heattree.pdf heattree_plots
 fi

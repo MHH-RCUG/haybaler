@@ -2,26 +2,8 @@
 # Sophia Poertner
 # Run haybaler https://github.com/MHH-RCUG/haybaler/
 
-version="0.21, May 2021"
+version="0.21, June 2021"
 echo "Starting Haybaler, run_haybaler.sh version" $version
-
-# set directory to get the haybaler heatmaps scripts from
-# use default directory if no argument ($1) given
-
-# Users: change this to your haybaler path
-haybaler_directory="/mnt/ngsnfs/tools/dev/haybaler/"
-# Change this to your existing conda env
-. /mnt/ngsnfs/tools/miniconda3/etc/profile.d/conda.sh
-conda activate haybaler
-
-
-# Users: don't modify this section
-if [[ -z "$1" ]]
-then
-  haybaler_dir=$haybaler_directory
-else
-  haybaler_dir="$1"
-fi
 
 outputDir=haybaler_output
 if [[ ! -d $outputDir ]]
@@ -29,6 +11,10 @@ then
     echo "INFO: Creating directory:" $outputDir
     mkdir $outputDir
 fi
+
+# get conda_env and haybaler_dir from conifg_yaml. Run setup.sh and restart session
+. $conda_env
+conda activate haybaler
 
 cp $haybaler_dir/*.py $outputDir
 cp $haybaler_dir/runbatch_heatmaps.sh $outputDir
@@ -39,10 +25,10 @@ cp $haybaler_dir/run_haybaler_tax.sh $outputDir
 input_files=""
 
 # Only run for *bam*.csv if files exist in current dir
-count=`ls -1 *.bam*.csv 2>/dev/null | wc -l`
+count=$(ls -1 *.bam*.csv 2>/dev/null | wc -l)
 if [[ $count != 0 ]]
     then
-    for csv in $(ls *.bam*.csv)
+    for csv in ls *.bam*.csv
     do
       input_files="$input_files;$csv"
     done
@@ -50,10 +36,10 @@ fi
 
 
 # Only run for *bam*.txt if files exist in current dir
-count=`ls -1 *.bam*.txt 2>/dev/null | wc -l`
+count=$(ls -1 *.bam*.txt 2>/dev/null | wc -l)
 if [[ $count != 0 ]]
     then
-    for csv in $(ls *.bam*.txt)
+    for csv in *.bam*.txt
     do
       input_files="$input_files;$csv"
     done

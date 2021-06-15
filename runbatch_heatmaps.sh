@@ -21,7 +21,7 @@ prepare_files () {
         # remove _complete_genome from labels
         sed "s/_complete_genome//g" $infile.filt2.csv > $infile.filt.heatmap.csv
 
-        # shorten TODO names to 20 chars? awk ?
+        # TODO shorten names to 20 chars? awk ?
         #$infile.filt.heatmap.csv > $infile.filt.heatmap.csv
   done
 }
@@ -31,7 +31,8 @@ create_heatmaps () {
   echo "INFO: Starting batch heatmap creation"
 
 # check for rscript, exit if unavailable
-rscript_bin="/usr/bin/Rscript"
+# rscript_bin="/usr/bin/Rscript"
+# get rscript_bin forom config_yaml. Run setup.sh and restart session
 if [[ ! -f $rscript_bin ]]
         then
         echo "INFO: Rscript binary not found, aborting. Could not find this, is R installed? " $rscript_bin
