@@ -82,7 +82,7 @@ heatmap(
 ) 
 #attempt to add scale/ legend
 legend(x="bottomright", legend=c("min", "ave", "max"),
-     fill=colorRampPalette(brewer.pal(8, "Oranges"))(3))
+       fill=colorRampPalette(brewer.pal(8, "Oranges"))(3))
 
 dev.off()
 
@@ -97,10 +97,24 @@ heatmap(
 )
 #attempt to add scale/ legend
 legend(x="bottomright", legend=c("min", "ave", "max"), 
-     fill=colorRampPalette(brewer.pal(8, "Oranges"))(3))
+       fill=colorRampPalette(brewer.pal(8, "Oranges"))(3))
 
 dev.off()
 
+# log heatmap
+output_pdf = paste0(file,"_","heatmap1_log2.pdf")
+pdf(output_pdf, width=16*heatmap_size, height=8*heatmap_size)
+heatmap(
+        log2(your_data_2 + 1), 
+        cexRow = size_rows, 
+        cexCol = size_columns, 
+        col = colorRampPalette(brewer.pal(8, "Oranges"))(25)
+) 
+#attempt to add scale/ legend
+legend(x="bottomright", legend=c("min", "ave", "max"),
+       fill=colorRampPalette(brewer.pal(8, "Oranges"))(3))
+
+dev.off()
 
 # create an interactive HTML heatmap with heatmaply
 # Other color options see https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
@@ -122,6 +136,17 @@ heatmaply(
 output_html = paste0(file,"_","heatmaply2_sqrt.html")
 heatmaply(
         sqrt(your_data_2), 
+        #color = YlGn,
+        #color = Blues,
+        color = cool_warm,
+        #file=c(output_html, output_png)  #png needs another missing dependency
+        file=c(output_html)
+)
+
+# log2
+output_html = paste0(file,"_","heatmaply1_log2.html")
+heatmaply(
+        log2(your_data_2 + 1), 
         #color = YlGn,
         #color = Blues,
         color = cool_warm,
