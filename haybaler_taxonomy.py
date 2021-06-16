@@ -53,7 +53,7 @@ def find_genus(csv):
                 if not re.search("[Hh]uman", element):
                     name = element
                     break
-                else:  # for e.g. NC_001352_1_Human_papillomavirus___2__complete_genome_VIR
+                else:  # for e.g. NC_001352_1_Human_papillomavirus_2_complete_genome_VIR
                     next_element_index = split.index(element) + 1
                     next_element = split[next_element_index]
                     name = element + " " + next_element
@@ -67,7 +67,7 @@ def find_genus(csv):
 def find_double_taxid(df, taxonomy_name):
     # In the package pytaxonkit is a phenomenon which makes it hard to assign a lineage to the original reference name
     # The method name2taxid assigns a TaxID to every input name. But a few different organisms share the same name so
-    # a few names there have 2 or more TaxIDs. name2taxid outputs all possible names so sometimes there are 2 or 3
+    # a few names have 2 or more TaxIDs. name2taxid outputs all possible names so sometimes there are 2 or 3
     # outputs for one input. We need to find out which TaxID is correct if possible.
     # -> filter for multiple lines with the same name but different TaxIDs
     # Additionally sometimes the method lineage outputs a different name than what was originally the input name so the
@@ -91,7 +91,7 @@ def find_double_taxid(df, taxonomy_name):
             double_taxid = False
             continue
         if index + 2 < len(df):
-            # if three following organisms have the same Name but different TaxIDs
+            # if three following organisms have the same name but different TaxIDs
             if row["Name"] == df["Name"][index + 1] and row["Name"] == df["Name"][index + 2] and row["TaxID"] != \
                     df["TaxID"][index + 1] and row["TaxID"] != df["TaxID"][index + 2] and df["TaxID"][index + 2] != \
                     df["TaxID"][index + 1]:
@@ -110,7 +110,7 @@ def find_double_taxid(df, taxonomy_name):
                 else:
                     one_row = pd.DataFrame([row["Name"]], columns=["Name"])
                     new_df = pd.concat([new_df, one_row])
-            # if two have the same Name but different TaxIDs
+            # if two following organisms have the same name but different TaxIDs
             elif row["Name"] == df["Name"][index + 1] and row["TaxID"] != df["TaxID"][index + 1]:
                 domain_1 = row["Lineage"].split(";")[0]
                 domain_2 = df["Lineage"][index + 1].split(";")[0]
@@ -127,7 +127,7 @@ def find_double_taxid(df, taxonomy_name):
             else:
                 new_df = new_df.append(row)
         elif index + 1 < len(df):
-            # if two have the same Name but different TaxIDs
+            # if two following organisms have the same name but different TaxIDs
             if row["Name"] == df["Name"][index + 1] and row["TaxID"] != df["TaxID"][index + 1]:
                 domain_1 = row["Lineage"].split(";")[0]
                 domain_2 = df["Lineage"][index + 1].split(";")[0]
@@ -181,7 +181,7 @@ def get_taxonomy(rank):
     taxids = taxonomy["TaxID"].to_list()
     lineage = pytaxonkit.lineage(taxids)
     filtered_csv = find_double_taxid(lineage, taxonomy["Name"])
-    return filtered_csv, taxonomy
+    return filtered_csv, taxonomy, lineage
 
 
 def save_csv(csv, path, name):
@@ -192,11 +192,8 @@ def save_csv(csv, path, name):
                  "inputfile gets overwritten.".format(name))
 
 
-def report(taxa, filtered_csv, taxonomy, csv, input_file, rank):
+def report(csv, taxa, taxonomy, lineage, filtered_csv, input_file, rank):
     if len(taxa) == len(filtered_csv):
-        nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())  # list of names that produce NAN
-        # print(csv[csv['genus'].isin(nan_list)]["genus"])  # print everything that didn't work with pytaxonkit
-
         # insert taxa and lineage as series in the df and replace nan with ";;;;;;
         genus_series = pd.Series(taxa)
         lineage_series = pd.Series(filtered_csv["Lineage"].values)
@@ -222,14 +219,22 @@ def report(taxa, filtered_csv, taxonomy, csv, input_file, rank):
         print("The input for lineage is", len(taxa), "organisms long. The output is", len(filtered_csv),
               "long. In the process of getting taxid, lineage and filtering something must have gone wrong")
         print("")
-        # uncomment the following lines to compare the lineages in different filter steps. Good for bugs
-        # all_steps = pd.concat((pd.Series(csv.index.values), pd.Series(genus)), axis=1, ignore_index=True)
-        # all_steps = pd.concat((all_steps, taxonomy[["Name", "TaxID"]]), axis=1, ignore_index=True)
-        # all_steps = pd.concat((all_steps, lineage["Name"]), axis=1, ignore_index=True)
-        # all_steps = pd.concat((all_steps, filtered_csv["Name"]), axis=1, ignore_index=True)
-        # all_steps.columns = ["reference_name", "filtered_genus", "name_to_Taxid_Name", "name_to_taxid_TaxID", "lineage_Name", "filtered_csv_Name"]
-        # all_steps.to_csv("compare_filter_steps.txt", index=False)
-        # print(all_steps)
+
+    # # uncomment the following lines to print everything that didn't work with pytaxonkit
+    # nan_list = set(taxonomy[taxonomy["TaxID"].isna()]["Name"].to_list())  # list of names that produce NAN
+    # print(csv[csv['genus'].isin(nan_list)]["genus"])
+    # print("")
+
+    # # uncomment the following lines to compare the lineages in different filter steps. Good for bugs
+    # all_steps = pd.concat((pd.Series(csv.index.values), pd.Series(taxa)), axis=1, ignore_index=True)
+    # all_steps = pd.concat((all_steps, taxonomy[["Name", "TaxID"]]), axis=1, ignore_index=True)
+    # all_steps = pd.concat((all_steps, lineage[["Name", "TaxID"]]), axis=1, ignore_index=True)
+    # all_steps = pd.concat((all_steps, filtered_csv["Name"]), axis=1, ignore_index=True)
+    # all_steps.columns = ["reference_name", "filtered_input_name", "name_to_Taxid_Name", "name_to_taxid_TaxID",
+    #                      "lineage_Name", "lineage_TaxID", "filtered_output_Name"]
+    # print(all_steps)
+    # print("")
+    # all_steps.to_csv("compare_taxa_filter_steps.txt", index=False)
 
 
 def add_taxonomy_to_df(csv, taxonomy, filtered_csv, df, path, file, rank):
@@ -255,21 +260,21 @@ def add_taxonomy_to_df(csv, taxonomy, filtered_csv, df, path, file, rank):
 @click.option('--input_path', '-p', help='Path of the input file, use . for current directory', required=True)
 @click.option('--test_reference', '-t', help='Set to True if references should be tested. Default = False', default=False)
 def main(input_file, input_path, test_reference):
-    # pd.set_option('display.max_rows', 100000)
+    pd.set_option('display.max_rows', 100000)
     if not test_reference:
         csv = pd.read_csv(input_path + "/" + input_file, sep="\t", index_col=0, header=0)
     else:
         csv = pd.read_csv(input_path + "/" + input_file, sep="\t", index_col=0, header=None)
     genus = find_genus(csv)
-    filtered_genus, taxonomy_genus = get_taxonomy(genus)
+    filtered_genus, taxonomy_genus, lineage_genus = get_taxonomy(genus)
     species = find_species(csv, input_file, input_path)
-    filtered_species, taxonomy_species = get_taxonomy(species)
+    filtered_species, taxonomy_species, lineage_species = get_taxonomy(species)
     if not test_reference:
         csv = add_taxonomy_to_df(csv, taxonomy_genus, filtered_genus, genus, input_path, input_file, rank="genus")
         add_taxonomy_to_df(csv, taxonomy_species, filtered_species, species, input_path, input_file, rank="species")
     else:
-        report(genus, filtered_genus, taxonomy_genus, csv, input_file, rank="genus")
-        report(species, filtered_species, taxonomy_species, csv, input_file, rank="species")
+        report(csv, genus, taxonomy_genus, lineage_genus, filtered_genus, input_file, rank="genus")
+        report(csv, species, taxonomy_species, lineage_species, filtered_species, input_file, rank="species")
 
 
 if __name__ == "__main__":
