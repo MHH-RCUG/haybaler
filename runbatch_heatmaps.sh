@@ -49,6 +49,8 @@ for heatmapcsv in `ls *.heatmap.csv`
 done
 }
 
+source parse_yaml.sh
+eval $(parse_yaml config_yaml)
 
 # Create heatmaps with 50 taxa
 if [[ ! -d "top_50_taxa" ]]

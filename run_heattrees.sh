@@ -7,6 +7,9 @@
 # Usage: bash run_heattrees.sh
 
 
+source parse_yaml.sh
+eval $(parse_yaml config_yaml)
+
 # Run only on certain server
 server1=hpc-bc15-07
 server2=hpc-bc15-12

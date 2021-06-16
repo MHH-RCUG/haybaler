@@ -6,8 +6,11 @@
 
 echo "Starting Haybaler taxonomy"
 
-# get conda_env from conifg_yaml. Run setup.sh and restart session
-. $conda_env
+# get CONDA_SH_PATH from conifg_yaml. Run setup.sh and restart session
+source parse_yaml.sh
+eval $(parse_yaml config_yaml)
+
+. $CONDA_SH_PATH
 conda activate haybaler
 
 
