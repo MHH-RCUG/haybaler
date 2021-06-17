@@ -245,9 +245,17 @@ def add_taxonomy_to_df(csv, taxonomy, filtered_csv, df, path, file, rank):
     lineage_series = pd.Series(filtered_csv["Lineage"].values)
     # insert genus and species name and lineage at the end of the csv
     if len(csv) == len(lineage_series):
+        # save taxa.csv
         csv.insert(loc=len(csv.columns), column=rank + '_name', value=genus_series.values)
         csv.insert(loc=len(csv.columns), column=rank + '_lineage', value=lineage_series.values)
         save_csv(csv, path, file)
+
+        # save a df with every chromosome that didn't work and get the total value for every sample from that df
+        csv_not_known = csv[csv[rank + '_name'] == "NOT KNOWN"].drop(list(csv.filter(regex=".*_name|.*_lineage")), axis='columns')
+        total = csv_not_known.sum(numeric_only=True).rename("total")
+        total_df = pd.DataFrame([total])
+        df_not_known = pd.concat([total_df, csv_not_known])
+        df_not_known.to_csv("{}/no_{}_found_for_chromosomes.csv".format(path, rank), sep="\t")
     else:
         print("The input for lineage is", len(df), "organisms long. The output is", len(filtered_csv),
               "long. In the process of getting taxid, lineage and filtering something must have gone wrong")

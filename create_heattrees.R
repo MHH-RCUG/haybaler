@@ -140,7 +140,7 @@ for(sample in samples) {
   ggsave(output_pdf, plot=plot, device = "pdf")
 }
 
-write(empty_samples, paste0(path, "/empty_samples.txt"))
+write(empty_samples, paste0(path, "/empty_heattree_samples.txt"))
 
 
 #####
