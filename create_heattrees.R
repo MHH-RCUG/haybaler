@@ -46,7 +46,7 @@ wanted_column <- "species_lineage"
 node_size_range <- c(0.01, 0.05)
 edge_size_range <- c(0.005, 0.025)
 node_color_axis_label <- "absolute abundance in\n sample (color)"
-node_size_axis_label <- "\nabsolute abunance among\n all samples (size)"
+node_size_axis_label <- "\nabsolute abundance among\n all samples (size)"
 title_size <- 0.05
 
 
@@ -89,6 +89,8 @@ plot <- heat_tree(input_taxmap,
                   node_label = taxon_names(input_taxmap),
                   node_size = input_taxmap$data$tax_abund$sums,
                   node_color =  input_taxmap$data$tax_abund$sums,
+                  node_size_range = node_size_range,
+                  edge_size_range = edge_size_range,
                   node_color_axis_label = "summarized abundance\n from all samples",
                   title = data_type,
                   title_size = title_size
@@ -138,7 +140,7 @@ for(sample in samples) {
   ggsave(output_pdf, plot=plot, device = "pdf")
 }
 
-write(empty_samples, paste0(path, "/empty_samples.txt"))
+write(empty_samples, paste0(path, "/empty_heattree_samples.txt"))
 
 
 #####
