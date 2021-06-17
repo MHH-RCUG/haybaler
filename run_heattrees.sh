@@ -7,8 +7,9 @@
 # Usage: bash run_heattrees.sh
 
 
-source parse_yaml.sh
-eval $(parse_yaml config_yaml)
+# Setup conda and directories
+source $WOCHENENDE_DIR/scripts/parse_yaml.sh
+eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
 
 # Run only on certain server
 server1=hpc-bc15-07

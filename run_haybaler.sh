@@ -12,9 +12,10 @@ then
     mkdir $outputDir
 fi
 
-# get CONDA_SH_PATH and HAYBALER_DIR from conifg_yaml. Run setup.sh and restart session
-. $CONDA_SH_PATH
-conda activate haybaler
+# Setup conda and directories
+source $WOCHENENDE_DIR/scripts/parse_yaml.sh
+eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
+
 
 cp $HAYBALER_DIR/*.py $outputDir
 cp $HAYBALER_DIR/runbatch_heatmaps.sh $outputDir

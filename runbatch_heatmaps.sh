@@ -32,7 +32,7 @@ create_heatmaps () {
 
 # check for rscript, exit if unavailable
 # rscript_bin="/usr/bin/Rscript"
-# get rscript_bin forom config_yaml. Run setup.sh and restart session
+# get rscript_bin form config_yaml. Run setup.sh and restart session
 if [[ ! -f $rscript_bin ]]
         then
         echo "INFO: Rscript binary not found, aborting. Could not find this, is R installed? " $rscript_bin
@@ -49,8 +49,9 @@ for heatmapcsv in `ls *.heatmap.csv`
 done
 }
 
-source parse_yaml.sh
-eval $(parse_yaml config_yaml)
+# Setup conda and directories
+source $WOCHENENDE_DIR/scripts/parse_yaml.sh
+eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
 
 # Create heatmaps with 50 taxa
 if [[ ! -d "top_50_taxa" ]]
