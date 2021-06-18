@@ -21,6 +21,7 @@ cp $HAYBALER_DIR/*.py $outputDir
 cp $HAYBALER_DIR/runbatch_heatmaps.sh $outputDir
 cp $HAYBALER_DIR/create_heatmap.R $outputDir
 cp $HAYBALER_DIR/run_heattrees.sh $outputDir
+cp $HAYBALER_DIR/create_heattrees.R $outputDir
 cp $HAYBALER_DIR/run_haybaler_tax.sh $outputDir
 
 input_files=""
