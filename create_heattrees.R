@@ -41,6 +41,14 @@ directory = "."         # directory you want the heatmap to be saved in ("." is 
 # wanted_column <- "genus_lineage"
 wanted_column <- "species_lineage"
 
+# Aesthetic arguments for Heat tree creation(size or text), change as you like 
+# for more infomation: https://rdrr.io/cran/metacoder/man/heat_tree.html
+node_size_range <- c(0.01, 0.05)
+edge_size_range <- c(0.005, 0.025)
+node_color_axis_label <- "absolute abundance in\n sample (color)"
+node_size_axis_label <- "\nabsolute abundance among\n all samples (size)"
+title_size <- 0.05
+
 
 #####
 # file preparation 
@@ -81,9 +89,11 @@ plot <- heat_tree(input_taxmap,
                   node_label = taxon_names(input_taxmap),
                   node_size = input_taxmap$data$tax_abund$sums,
                   node_color =  input_taxmap$data$tax_abund$sums,
+                  node_size_range = node_size_range,
+                  edge_size_range = edge_size_range,
                   node_color_axis_label = "summarized abundance\n from all samples",
                   title = data_type,
-                  title_size = 0.05
+                  title_size = title_size
 )
 output_pdf = paste0(filename,"_all_samples_heattree.pdf")
 ggsave(output_pdf, plot=plot, device = "pdf")
@@ -117,20 +127,20 @@ for(sample in samples) {
             node_label = taxon_names(input_taxmap),
             node_size = input_taxmap$data$tax_abund[[sample]],
             node_color =  input_taxmap$data$tax_abund[[sample]],
-            node_size_range = c(0.01, 0.05),
+            node_size_range = node_size_range,
             node_size_interval = range(c(0,max_col_sum), na.rm = TRUE, finite = TRUE),
-            edge_size_range = c(0.005, 0.025),
+            edge_size_range = edge_size_range,
             edge_size_interval = range(c(0,max_col_sum), na.rm = TRUE, finite = TRUE),
-            node_color_axis_label = "absolute abundance in\n sample (color)",
-            node_size_axis_label = "absolute abunance among\n all samples (size)",
+            node_color_axis_label = node_color_axis_label,
+            node_size_axis_label = node_size_axis_label,
             title = data_type,
-            title_size = 0.05
+            title_size = title_size
   )
   output_pdf = paste0(filename,"_",sample,"_background_heattree.pdf")
   ggsave(output_pdf, plot=plot, device = "pdf")
 }
 
-write(empty_samples, paste0(path, "/empty_samples.txt"))
+write(empty_samples, paste0(path, "/empty_heattree_samples.txt"))
 
 
 #####
@@ -168,14 +178,14 @@ for(sample in samples) {
             node_label = one_sample_taxmap$taxon_names(),
             node_size = one_sample_taxmap$data$tax_abund[[sample]],
             node_color = one_sample_taxmap$data$tax_abund[[sample]],
-            node_size_range = c(0.01, 0.05),
+            node_size_range = node_size_range,
             node_size_interval = range(c(0,max_col_sum), na.rm = TRUE, finite = TRUE),
-            edge_size_range = c(0.005, 0.025),
+            edge_size_range = edge_size_range,
             edge_size_interval = range(c(0,max_col_sum), na.rm = TRUE, finite = TRUE),
-            node_color_axis_label = "absolute abundance in\n sample (color)",
-            node_size_axis_label = "absolute abunance among\n all samples (size)",
+            node_color_axis_label = node_color_axis_label,
+            node_size_axis_label = node_size_axis_label,
             title = data_type,
-            title_size = 0.05
+            title_size = title_size
   )
   output_pdf = paste0(filename,"_",sample,"_no_background_heattree.pdf")
   ggsave(output_pdf, plot=plot, device = "pdf")
