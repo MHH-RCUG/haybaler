@@ -2,7 +2,7 @@
 # Sophia Poertner
 # Run haybaler https://github.com/MHH-RCUG/haybaler/
 
-version="0.21, June 2021"
+version="0.22, June 2021"
 echo "Starting Haybaler, run_haybaler.sh version" $version
 
 outputDir=haybaler_output
@@ -12,10 +12,12 @@ then
     mkdir $outputDir
 fi
 
-# Setup conda and directories
+# Setup config
 source $WOCHENENDE_DIR/scripts/parse_yaml.sh
 eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
-
+# Setup conda and directories
+. $CONDA_SH_PATH
+conda activate $HAYBALER_CONDA_ENV_NAME
 
 cp $HAYBALER_DIR/*.py $outputDir
 cp $HAYBALER_DIR/runbatch_heatmaps.sh $outputDir
