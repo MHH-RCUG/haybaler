@@ -7,23 +7,20 @@
 # Usage: bash run_heattrees.sh
 
 
-# Run only on certain server
-server1=hpc-bc15-07
-server2=hpc-bc15-12
-server3=hpc06
+# Setup conda and directories
+source $WOCHENENDE_DIR/scripts/parse_yaml.sh
+eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
 
-
-if [[ $(hostname) == $server1 || $(hostname) == $server2 || $(hostname) == $server3 ]]
-        then
-        echo "INFO: Found hostname $(hostname). OK. Will attempt to run heat trees here"
-#elif [[ $(hostname) == $server2 ]]
-#        then
-#        echo "INFO: Found hostname $server2. OK. Will attempt to run heat trees here"
-#elif [[ $(hostname) == $server2 ]]
-#        then
-#        echo "INFO: Found hostname $server2. OK. Will attempt to run heat trees here"
-else
-        echo "INFO: Can only run heat trees on server where heat-trees dependencies are installed, eg. $server1. We can't run heat trees here!"
+# run heattrees only on certain servers with heattree dependencies installed
+server_found=0
+for server in $heattree_server; do
+  if [[ $(hostname) == $server ]]; then
+    echo "INFO: Found hostname $(hostname). OK. Will attempt to run heat trees here"
+    server_found=1
+  fi
+done
+if [ $server_found == 0 ]; then
+  echo "WARNING: Can only run heat trees on server where heat-trees dependencies are installed, eg. $heattree_server. We can't run heat trees here!"
 fi
 
 
@@ -53,9 +50,6 @@ prepare_files () {
 
 create_heattrees () {
   echo "INFO: Starting batch heat-tree creation"
-
-    # check for rscript, exit if unavailable
-    rscript_bin="/usr/bin/Rscript"
     if [[ ! -f $rscript_bin ]]
             then
             echo "INFO: Rscript binary not found, aborting. Could not find this, is R installed? " $rscript_bin
@@ -80,8 +74,6 @@ create_heattrees () {
     fi
 }
 
-
-echo "INFO: run this script only on: $server1 or $server2 or $server3"
 
 # Actually run functions
 set_ulimits
@@ -143,7 +135,7 @@ if [[ $bphc_count_background_pdf != 0 ]]
 fi
 
 count_all_samples=$(ls -1 *all_samples_heattree.pdf 2>/dev/null | wc -l)
-if [[ $bphc_count_background_pdf != 0 ]]
+if [[ $count_all_samples != 0 ]]
     then
     mv *all_samples_heattree.pdf heattree_plots
 fi
