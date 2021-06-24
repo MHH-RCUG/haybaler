@@ -88,22 +88,22 @@ if [[ $count_pdf != 0 ]]
 
     then
     mkdir top_200_taxa
-  fi
-  # Run bash function for 200 taxa
-  prepare_files 200
-  create_heatmaps
-  count_html=`ls -1 *heatmap*.html 2>/dev/null | wc -l`
-  count_pdf=`ls -1 *heatmap*.pdf 2>/dev/null | wc -l`
-  if [[ $count_pdf != 0 ]]
-      then
-      mv *heatmap*.pdf top_200_taxa
-  fi
-  if [[ $count_html != 0 ]]
-      then
-      mv *heatmap*.html top_200_taxa
-  fi
+fi
+# Run bash function for 200 taxa
+prepare_files 200
+create_heatmaps
+count_html=`ls -1 *heatmap*.html 2>/dev/null | wc -l`
+count_pdf=`ls -1 *heatmap*.pdf 2>/dev/null | wc -l`
+if [[ $count_pdf != 0 ]]
+    then
+    mv *heatmap*.pdf top_200_taxa
+fi
+if [[ $count_html != 0 ]]
+    then
+    mv *heatmap*.html top_200_taxa
+fi
 
   echo "INFO: Script completed"
-else
-  echo "no input files found for heatmaps creation. Needs *haybaler.csv as input"
-fi
+#else - SP TODO - this was throwing a syntax error
+#  echo "no input files found for heatmaps creation. Needs *haybaler.csv as input"
+#fi
