@@ -81,6 +81,9 @@ bash runbatch_heatmaps.sh
 ### Heattrees
 - Get taxonomy
 - Needs taxonkit Datasets installed https://bioinf.shenwei.me/taxonkit/#dataset
+- saves every chomosome where it is not possible to identify genus/species in no_genus/species_found_for_chromosomes.csv
+- more details about the script: haybaler_taxa.md
+
 ```
 # copy the taxonomy script in the haybaler_output_directory
 cd haybaler_output
@@ -97,6 +100,7 @@ bash run_haybaler_tax.sh
 - one heattree for the sums of all sample
 - one heattree for each sample with the sums as "background"
 - one heattree for each sample without "background"
+- do not create heattrees for empty samples. They are saved in an empty_samples.txt
 ```
 # copy the heattree scripts in the haybaler_output_directory
 cd haybaler_output
@@ -107,13 +111,27 @@ bash run_heattrees.sh
 ```
 #### change the level (genus or species) for the heattrees
 
-- edit the create_heattrees.R Script
+- edit the create_heattrees.R script
 
 ```
 # go to line 31
 ## column with the lineage information. Uncomment one
 # wanted_column <- "genus_lineage"
 wanted_column <- "species_lineage"
+```
+
+#### change node/edge/label sizes
+- edit the create_heatrees.R script
+
+```
+# go to line 44
+# Aesthetic arguments for Heat tree creation(size or text), change as you like 
+# for more infomation: https://rdrr.io/cran/metacoder/man/heat_tree.html
+node_size_range <- c(0.01, 0.05)
+edge_size_range <- c(0.005, 0.025)
+node_color_axis_label <- "absolute abundance in\n sample (color)"
+node_size_axis_label <- "\nabsolute abundance among\n all samples (size)"
+title_size <- 0.05 
 ```
 
 
