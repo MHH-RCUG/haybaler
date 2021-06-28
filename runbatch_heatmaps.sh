@@ -5,6 +5,7 @@
 # exclude GC, ref length, any host chr etc (all distort heatmaps)
 # Sophia Poertner, Colin Davenport, 2020-2021
 
+## FUNCTIONS ##
 
 prepare_files () {
   echo "INFO: Preparing files for R heatmap creation"
@@ -24,8 +25,6 @@ prepare_files () {
         # cleanup: remove temp filt1.csv and filt2.csv files
         rm $infile.filt1.csv
         rm $infile.filt2.csv
-
-
   done
 }
 
@@ -52,58 +51,56 @@ for heatmapcsv in *.heatmap.csv
 done
 }
 
+## HEATMAP CREATION ##
+
 # Setup conda and directories
 source $WOCHENENDE_DIR/scripts/parse_yaml.sh
 eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
 
-# Create heatmaps with 50 taxa
-if [[ ! -d "top_50_taxa" ]]
+
+count_haybaler_csv=`ls -1 *haybaler.csv 2>/dev/null | wc -l`
+if [[ $count_haybaler_csv != 0 ]]
+    then
+    # Create heatmaps with 50 taxa
+    if [[ ! -d "top_50_taxa" ]]
         then
-	mkdir top_50_taxa
-fi
-# Run bash function for 50 taxa
-prepare_files 50
-create_heatmaps
-if [[ $count_pdf != 0 ]]
-    then
-    mv *heatmap*.pdf top_50_taxa
-fi
-if [[ $count_html != 0 ]]
-    then
-    mv *heatmap*.html top_50_taxa
-fi
+      mkdir top_50_taxa
+    fi
+    # Run bash function for 50 taxa
+    prepare_files 50
+    create_heatmaps
+    count_html=`ls -1 *heatmap*.html 2>/dev/null | wc -l`
+    count_pdf=`ls -1 *heatmap*.pdf 2>/dev/null | wc -l`
+    if [[ $count_pdf != 0 ]]
+        then
+        mv *heatmap*.pdf top_50_taxa
+    fi
+    if [[ $count_html != 0 ]]
+        then
+        mv *heatmap*.html top_50_taxa
+    fi
 
 
-# Create heatmaps with 200 taxa
-if [[ ! -d "top_200_taxa" ]]
-	then
-	mkdir top_200_taxa
-fi
-# Run bash function for 200 taxa
-prepare_files 200
-create_heatmaps
-count_html=`ls -1 *heatmap*.html 2>/dev/null | wc -l`
-count_pdf=`ls -1 *heatmap*.pdf 2>/dev/null | wc -l`
-if [[ $count_pdf != 0 ]]
-
-    then
-    mkdir top_200_taxa
-  fi
-  # Run bash function for 200 taxa
-  prepare_files 200
-  create_heatmaps
-  count_html=`ls -1 *heatmap*.html 2>/dev/null | wc -l`
-  count_pdf=`ls -1 *heatmap*.pdf 2>/dev/null | wc -l`
-  if [[ $count_pdf != 0 ]]
-      then
-      mv *heatmap*.pdf top_200_taxa
-  fi
-  if [[ $count_html != 0 ]]
-      then
-      mv *heatmap*.html top_200_taxa
-  fi
-
-  echo "INFO: Script completed"
+    # Create heatmaps with 200 taxa
+    if [[ ! -d "top_200_taxa" ]]
+        then
+      mkdir top_200_taxa
+    fi
+    # Run bash function for 200 taxa
+    prepare_files 200
+    create_heatmaps
+    count_html=`ls -1 *heatmap*.html 2>/dev/null | wc -l`
+    count_pdf=`ls -1 *heatmap*.pdf 2>/dev/null | wc -l`
+    if [[ $count_pdf != 0 ]]
+        then
+        mv *heatmap*.pdf top_200_taxa
+    fi
+    if [[ $count_html != 0 ]]
+        then
+        mv *heatmap*.html top_200_taxa
+    fi
+    echo "INFO: Script completed"
 else
-  echo "no input files found for heatmaps creation. Needs *haybaler.csv as input"
+    echo "no input files found for heatmaps creation. Needs *haybaler.csv as input"
 fi
+

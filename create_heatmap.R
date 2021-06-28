@@ -102,7 +102,7 @@ legend(x="bottomright", legend=c("min", "ave", "max"),
 dev.off()
 
 # log heatmap
-output_pdf = paste0(file,"_","heatmap1_log2.pdf")
+output_pdf = paste0(file,"_","heatmap3_log2.pdf")
 pdf(output_pdf, width=16*heatmap_size, height=8*heatmap_size)
 heatmap(
         log2(your_data_2 + 1), 
@@ -144,7 +144,7 @@ heatmaply(
 )
 
 # log2
-output_html = paste0(file,"_","heatmaply1_log2.html")
+output_html = paste0(file,"_","heatmaply3_log2.html")
 heatmaply(
         log2(your_data_2 + 1), 
         #color = YlGn,
@@ -155,7 +155,7 @@ heatmaply(
 )
 
 # percentize (like percentage ranks)
-output_html = paste0(file,"_","heatmaply3_percentize.html")
+output_html = paste0(file,"_","heatmaply4_percentize.html")
 heatmaply(
         percentize(your_data_2), 
         #color = YlGn,
