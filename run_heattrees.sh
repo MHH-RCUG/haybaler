@@ -39,10 +39,13 @@ prepare_files () {
         if [[ $count_infile != 0 ]]
             then
             #exclude mouse, human, mito
-            grep -v "^chr" "$infile" | grep -v "^1_1_1" > "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv
+            grep -v "^chr" "$infile" | grep -v "^1_1_1" > "${infile%_haybaler_taxa.csv}"_heattree_filt1.csv
 
             # using tab delimiters, cut a max of 2000 columns out excluding cols 2-3.
-            cut -f1,4-2000 "${infile%_haybaler_taxa.csv}"_filt1_heattree.csv  > "${infile%_haybaler_taxa.csv}"_filt2_heattree.csv
+            cut -f1,4-2000 "${infile%_haybaler_taxa.csv}"_heattree_filt1.csv  > "${infile%_haybaler_taxa.csv}"_heattree.csv
+
+            # cleanup
+            rm "${infile%_haybaler_taxa.csv}"_heattree_filt1.csv
         fi
   done
 }
@@ -60,17 +63,17 @@ create_heattrees () {
 
     # create heat-tree for each heatmap.csv file
     # check if correct files present, else do not run the script, which would create empty files.
-    count=$(ls -1 {RPMM,bacteria_per_human_cell}*filt2_heattree.csv 2>/dev/null | wc -l)
+    count=$(ls -1 {RPMM,bacteria_per_human_cell}*heattree.csv 2>/dev/null | wc -l)
     if [[ $count != 0 ]]
         then
-        for heattreecsv in {RPMM,bacteria_per_human_cell}*filt2_heattree.csv
+        for heattreecsv in {RPMM,bacteria_per_human_cell}*heattree.csv
             do
             echo "INFO: Creating heat-tree for file: $heattreecsv"
             # run local
             $rscript_bin create_heattrees.R "$heattreecsv"
         done
     else
-        echo "Could not find heat-tree input files of type filt2_heattree.csv in the directory"
+        echo "Could not find heat-tree input files of type heattree.csv in the directory"
     fi
 }
 
