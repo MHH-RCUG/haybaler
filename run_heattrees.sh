@@ -15,12 +15,13 @@ eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
 server_found=0
 for server in $heattree_server; do
   if [[ $(hostname) == $server ]]; then
-    echo "INFO: Found hostname $(hostname). OK. Will attempt to run heat trees here"
+    echo "INFO: Found hostname $(hostname). OK. Will attempt to run heat trees here. Set server hostnames in file: " $WOCHENENDE_DIR/config.yaml
     server_found=1
   fi
 done
 if [ $server_found == 0 ]; then
-  echo "WARNING: Can only run heat trees on server where heat-trees dependencies are installed, eg. $heattree_server. We can't run heat trees here!"
+  echo "WARNING: Can only run heat trees on server where heat-trees dependencies are installed, eg. $heattree_server. We can't run heat trees here! "
+  echo "Set server hostnames in file: " $WOCHENENDE_DIR/config.yaml
 fi
 
 
