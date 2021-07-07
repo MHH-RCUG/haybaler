@@ -26,6 +26,15 @@ cp $HAYBALER_DIR/run_heattrees.sh $outputDir
 cp $HAYBALER_DIR/create_heattrees.R $outputDir
 cp $HAYBALER_DIR/run_haybaler_tax.sh $outputDir
 
+# cleanup possible old haybaler runs
+count=$(ls -1 $outputDir/*haybaler.csv 2>/dev/null | wc -l)
+if [[ $count != 0 ]]
+    then
+    rm $outputDir/*haybaler.csv
+fi
+rm -f excluded_taxa.csv
+
+
 input_files=""
 
 # Only run for *bam*.csv if files exist in current dir
