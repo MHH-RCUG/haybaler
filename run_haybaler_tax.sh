@@ -13,6 +13,12 @@ eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
 . $CONDA_SH_PATH
 conda activate haybaler
 
+# check if requirements for pytaxonkit are installed 
+if ! [ -d /home/$USER/.taxonkit ]; then
+  echo "requirements for pytaxonkit not found. Try to install them now"
+  wget -c ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz && tar -zxvf taxdump.tar.gz && mkdir -p $HOME/.taxonkit && cp names.dmp nodes.dmp delnodes.dmp merged.dmp $HOME/.taxonkit || echo "failed to install requirements" && exit
+fi
+
 
 # for samples
 count=`ls -1 *haybaler.csv 2>/dev/null | wc -l`
