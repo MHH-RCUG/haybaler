@@ -94,6 +94,7 @@ conda activate haybaler
 bash run_haybaler_tax.sh
 ```
 - Create Heattrees for RPMM and bacteria_per_human_cell files
+- for more information about heat trees: https://github.com/grunwaldlab/metacoder
 - needs R installation
 - Needs Metacoder package installed (makes troubble installing it, better try it before running the script)
 - exclude mouse, human and mito
