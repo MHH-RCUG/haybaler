@@ -15,7 +15,7 @@ conda activate haybaler
 
 # check if requirements for pytaxonkit are installed 
 if ! [ -d /home/$USER/.taxonkit ]; then
-  echo "requirements for pytaxonkit not found. Try to install them now"
+  echo "INFO: Haybaler taxonomy: Requirements for pytaxonkit not found. Trying to download/install them now"
   wget -c ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz && tar -zxvf taxdump.tar.gz && mkdir -p $HOME/.taxonkit && cp names.dmp nodes.dmp delnodes.dmp merged.dmp $HOME/.taxonkit || echo "failed to install requirements" && exit
 fi
 
