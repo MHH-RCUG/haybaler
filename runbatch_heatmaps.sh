@@ -33,11 +33,11 @@ create_heatmaps () {
   echo "INFO: Starting batch heatmap creation"
 
 # check for rscript, exit if unavailable
+# get rscript_bin from config_yaml. Run setup.sh and restart session
 # rscript_bin="/usr/bin/Rscript"
-# get rscript_bin form config_yaml. Run setup.sh and restart session
 if [[ ! -f $rscript_bin ]]
         then
-        echo "INFO: Rscript binary not found, aborting. Could not find this, is R installed? " $rscript_bin
+        echo "INFO: Rscript binary not found, aborting. Could not find Rscript here, is R installed? " $rscript_bin
         exit
 fi
 echo "INFO: Using rscript binary: " $rscript_bin
