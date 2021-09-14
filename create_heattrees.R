@@ -17,6 +17,10 @@ if(length(not_installed)) install.packages(not_installed, repos="http://cran.rst
 #load packages
 invisible(lapply(packages, library, character.only = TRUE))
 
+#suppress warnings from this script. 
+oldw <- getOption("warn")
+options(warn = -1)
+
 # Check and set ulimits in R (TEST). Bash setting might be sufficient
 #check Cstack size
 #Cstack_info()["size"]
@@ -191,3 +195,5 @@ for(sample in samples) {
   ggsave(output_pdf, plot=plot, device = "pdf")
 }
 
+#reset warnings to on
+options(warn = oldw)
