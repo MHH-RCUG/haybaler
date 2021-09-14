@@ -48,6 +48,10 @@ output_pdf = paste0(file,"_","heatmap.pdf")
 output_html = paste0(file,"_","heatmaply.html")
 output_png = paste0(file,"_","heatmaply.png")
 
+#suppress warnings from this script. 
+oldw <- getOption("warn")
+options(warn = -1)
+
 # Read the Data
 data = sprintf("%s/%s", path, file)
 your_data = read.csv(data, sep="\t", header=TRUE, row.names = 1)
@@ -165,3 +169,5 @@ heatmaply(
         file=c(output_html)
 )
 
+#reset warnings to on
+options(warn = oldw)
