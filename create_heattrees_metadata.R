@@ -70,7 +70,7 @@ metadata <- metadata[metadata$samples %in% col_names ,]  # filter out samples wh
 
 
 ### Grouped heat trees with metadata ###
-# !!! make sure that the sample names in "input_file" and "meatadata" are the same and name the sample column in metadata "samples"!!!
+# !!! make sure that the sample names in "input_file" and "metadata" are the same and name the sample column in metadata "samples"!!!
 
 data_type <- str_replace(filename, "_filt2_heattree.csv", "")   # RPMM or bacteria_per_human_cell
 
