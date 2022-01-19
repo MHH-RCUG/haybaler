@@ -140,6 +140,59 @@ def exclude_taxa(file, path, taxa_to_exclude):
     df.to_csv(path + "/" + file, sep="\t")  # save again as csv
 
 
+def shorten_names(output_path, col, output_file, summing_short):
+    short = pd.read_csv(output_path + "/" + col + "_" + output_file, index_col = 0, sep = "\t")
+    rownames = list(short.index)
+    for row in rownames:
+        new_name = row
+        split_name = row.split("_")
+        for n in range(len(split_name)):
+            if split_name[n] == "organism" or split_name[n] == "candidatus":
+                new_name = split_name[n] + "_" + split_name[n+1] + "_" + split_name[n+2]
+                new_name = subspecies(new_name, n, 3, split_name)
+                short = check_existing(new_name, row, short, summing_short)
+                break
+            try:
+                first_letter = ord(split_name[n][0])
+                second_letter = ord(split_name[n][1])
+                second_first = ord(split_name[n+1][0])
+                if 64 < first_letter < 91 and 96 < second_letter < 123 and 96 < second_first < 123:
+                    new_name = split_name[n] + "_" + split_name[n+1]
+                    new_name = subspecies(new_name, n, 2, split_name)
+                    short = check_existing(new_name, row, short, summing_short)
+                    break
+            except:
+                pass
+
+    save_name = output_path + "/" +  col + "_" + output_file
+    save_name = save_name.split(".")[0] + "_short.csv"
+
+    index = short.index
+    if index.is_unique:  # only saved if all row names are unique
+        short.to_csv(save_name, sep='\t')
+    # if not all row names are unique: for the read count csv the values of the non unique rows are summed
+    elif col == "read_count":
+        short = short.groupby("species").sum()
+        short.to_csv(save_name, sep='\t') # save read count table
+
+
+def subspecies(new_name, n, count,split_name):
+    if split_name[n+count] == "subsp":
+        add = split_name[n+count+1]
+        while len(add) == 0:
+            count += 1
+            add = split_name[n+count+1]
+        new_name = new_name + "_subsp_" + add
+    return(new_name)
+
+
+def check_existing(new_name, row, short, summing_short):
+    if new_name in short.index:
+        summing_short.append("Warning: values of " + row + " have been summed to " + new_name)
+    short.rename(index={row:new_name}, inplace=True)
+    return(short)
+
+
 @click.command()
 @click.option('--input_files', '-i', help='Name of the input file', required=True)
 @click.option('--input_path', '-p', help='Path of the input file', required=True)
@@ -151,10 +204,12 @@ def exclude_taxa(file, path, taxa_to_exclude):
                                          'RPMM in every sample are filtered out"! Default = 300', default=300)
 def main(input_files, input_path, output_path, output_file, readcount_limit, rpmm_limit):
     list_input_files = input_files.split(";")[1:]
+    col_list = []
     # Debug prints messages on input and progress
     debug = False  # True or False
     if debug:
         print("INFO: Haybaler debug is on.")
+
     for input_file in list_input_files:
         try:
             if input_file.endswith('.csv'):
@@ -194,6 +249,8 @@ def main(input_files, input_path, output_path, output_file, readcount_limit, rpm
                         (input_file))
                 df.to_csv(output_path + "/" + col + "_" + output_file, sep='\t')
                 adding_species(output_path, col, output_file)
+                col_list.append(col)
+
 
     taxa_to_exclude = []
     excluded_taxa_readcount = None
@@ -225,6 +282,13 @@ def main(input_files, input_path, output_path, output_file, readcount_limit, rpm
     for haybaler_csv in os.listdir(output_path):
         if haybaler_csv.endswith(output_file):
             exclude_taxa(haybaler_csv, output_path, taxa_to_exclude)  # exclude the taxa from the haybaler.csv
+
+    # recreating all the output csv's with only species names as row names
+    summing_short = []
+    for col in list(set(col_list)):
+        summing_short.append(col + ":")
+        shorten_names(output_path, col, output_file, summing_short)
+    summing_short = "\n".join(summing_short)
 
 
 if __name__ == '__main__':
