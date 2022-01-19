@@ -60,10 +60,15 @@ for (i in row_names){
       if (split_name[n+3] == "subsp") {  # check for subspecies
         new_name <- subspecies(new_name, split_name)
       }
-      final_names <- c(final_names, new_name)
       return_items <- check_existing(new_name, i, duplicates)
       sn_bacteria_data <- return_items$data
       duplicates <- return_items$duplicates
+      if (new_name %in% duplicates) {
+        final_names <- c(final_names, i)
+      } else {
+        final_names <- c(final_names, new_name)
+      }
+      
       break
     }else if(length(first_letter) == 0 || length(second_letter) == 0 || length(rest) == 0){
     }else if(64 < first_letter && first_letter < 91 && 96 < second_letter && second_letter < 123){
@@ -72,11 +77,15 @@ for (i in row_names){
         new_name <- subspecies(new_name, split_name)
       }
       
-      final_names <- c(final_names,new_name)
       return_items <- check_existing(new_name, i, duplicates)
       sn_bacteria_data <- return_items$data
       duplicates <- return_items$duplicates
-    
+      if (new_name %in% duplicates) {
+        final_names <- c(final_names, i)
+      } else {
+        final_names <- c(final_names, new_name)
+      }
+      
       break
     }
   }

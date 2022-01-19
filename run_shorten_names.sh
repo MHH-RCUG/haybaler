@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#Lisa Hollstein Jan 2022
 
 mkdir short_names
 
