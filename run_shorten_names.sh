@@ -1,7 +1,6 @@
 #!/bin/bash
 
 
-
 mkdir short_names
 
 dir="$(pwd)"
