@@ -2,9 +2,6 @@
 # Lisa Hollstein, Dec 2021 - Jan 2022
 
 args <- commandArgs()
-args <- c("","","","","","/mnt/ngsnfs/gen/rcug_lw/Lisa/names","reads_per_million_reads_in_experiment_haybaler.csv.filt.heatmap.csv")
-
-print(args)
 
 setwd(args[6])
 
