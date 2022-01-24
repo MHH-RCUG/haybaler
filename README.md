@@ -1,13 +1,13 @@
 # Haybaler
-### Sophia Poertner, Colin Davenport, 2020-2021
+### Sophia Poertner, Colin Davenport, Lisa Hollstein 2020-2022
 
 - Combine your Wochenende .bam.txt or reporting output from multiple samples into one easy matrix.
-- Create simple heatmaps in R from the results
+- Create heatmaps and heat trees in R from the results
 - Works only for Wochenende https://github.com/MHH-RCUG/Wochenende, not for Kraken (kraken2table projects exist online for that).
 
 
 ### Details
-- Wochenende ouputs many files per sample. Every file contains different result types
+- Wochenende outputs many files per sample. Every file contains different result types
 - Haybaler collates the different files to one file per result type containing all samples
 - one file per sample containing all results -> one file per result type containing all samples
 - Less files, easy to compare different samples
@@ -18,7 +18,7 @@
 
 
 ### Installation via conda
-First install miniconda if you have not already done this.
+First install miniconda if you have not already done this. Use mamba instead of conda if you like faster installs (follow the mamba install instructions here https://github.com/mamba-org/mamba )
 Required libs are listed in the file env.haybaler.yml
 ```
 # first clone haybaler
@@ -26,6 +26,8 @@ git clone https://github.com/MHH-RCUG/haybaler
 cd haybaler
 # Set up a dedicated environment for haybaler
 conda env create -f env.haybaler.yml
+# OR mamba
+mamba env create -f env.haybaler.yml
 conda activate haybaler
 ```
 
@@ -54,18 +56,18 @@ python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --rea
  
 ### Output
 
-The output is in the created output folder, default haybaler_output
+The output is in the created output folder, default haybaler_output.
 
-Output is a set of CSVs. These combine the results from the original files into once matrix, so you can better compare your samples.
+Output is a set of CSVs. These combine the results from the original files into a single matrix, so you can better compare your samples.
 
 
 ### Refining the output
 
 You can read the output into R for example and do further analyses yourself, or use our heatmap and heattree scripts.
-Heatmaps and Heattrees are also generated with the postprocess script.
+Heatmaps and Heattrees are also generated with the `wochenende_postprocess.sh` script.
 
 ### Heatmaps
-- exclude mouse, human, mito
+- exclude mouse, human, mitos
 - heatmap for the top x organisms (default 50 and 200 taxa in version 0.16)
 - use both base R heatmap and heatmaply heatmaps
 - display raw and square-rooted results
