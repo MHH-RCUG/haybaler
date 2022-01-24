@@ -140,7 +140,7 @@ def exclude_taxa(file, path, taxa_to_exclude):
     df.to_csv(path + "/" + file, sep="\t")  # save again as csv
 
 
-def shorten_names(output_path, col, output_file, summing_short):
+def shorten_names(output_path, col, output_file):
     short = pd.read_csv(output_path + "/" + col + "_" + output_file, index_col = 0, sep = "\t")
     rownames = list(short.index)
     for row in rownames:
@@ -150,7 +150,7 @@ def shorten_names(output_path, col, output_file, summing_short):
             if split_name[n] == "organism" or split_name[n] == "candidatus":
                 new_name = split_name[n] + "_" + split_name[n+1] + "_" + split_name[n+2]
                 new_name = subspecies(new_name, n, 3, split_name)
-                short = check_existing(new_name, row, short, summing_short)
+                short = change_name(new_name, row, short)
                 break
             try:
                 first_letter = ord(split_name[n][0])
@@ -159,21 +159,18 @@ def shorten_names(output_path, col, output_file, summing_short):
                 if 64 < first_letter < 91 and 96 < second_letter < 123 and 96 < second_first < 123:
                     new_name = split_name[n] + "_" + split_name[n+1]
                     new_name = subspecies(new_name, n, 2, split_name)
-                    short = check_existing(new_name, row, short, summing_short)
+                    short = change_name(new_name, row, short)
                     break
             except:
                 pass
-
-    save_name = output_path + "/" +  col + "_" + output_file
-    save_name = save_name.split(".")[0] + "_short.csv"
-
+    save_name = output_path + "/" + col + "_" + output_file
+    try:
+        save_name = save_name.split(".")[-2] + "_short.csv"
+    except:
+        save_name = save_name + "_short.csv"
     index = short.index
     if index.is_unique:  # only saved if all row names are unique
         short.to_csv(save_name, sep='\t')
-    # if not all row names are unique: for the read count csv the values of the non unique rows are summed
-    elif col == "read_count":
-        short = short.groupby("species").sum()
-        short.to_csv(save_name, sep='\t') # save read count table
 
 
 def subspecies(new_name, n, count,split_name):
@@ -186,9 +183,7 @@ def subspecies(new_name, n, count,split_name):
     return(new_name)
 
 
-def check_existing(new_name, row, short, summing_short):
-    if new_name in short.index:
-        summing_short.append("Warning: values of " + row + " have been summed to " + new_name)
+def change_name(new_name, row, short):
     short.rename(index={row:new_name}, inplace=True)
     return(short)
 
@@ -284,11 +279,8 @@ def main(input_files, input_path, output_path, output_file, readcount_limit, rpm
             exclude_taxa(haybaler_csv, output_path, taxa_to_exclude)  # exclude the taxa from the haybaler.csv
 
     # recreating all the output csv's with only species names as row names
-    summing_short = []
     for col in list(set(col_list)):
-        summing_short.append(col + ":")
-        shorten_names(output_path, col, output_file, summing_short)
-    summing_short = "\n".join(summing_short)
+        shorten_names(output_path, col, output_file)
 
 
 if __name__ == '__main__':
