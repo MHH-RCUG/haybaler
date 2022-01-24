@@ -97,12 +97,12 @@ bash run_haybaler_tax.sh
 ```
 - Create Heattrees for RPMM and bacteria_per_human_cell files
 - needs R installation
-- Needs Metacoder package installed (makes troubble installing it, better try it before running the script)
+- Needs Metacoder package installed (makes trouble installing it, it is better to install it before running the script)
 - exclude mouse, human and mito
-- one heattree for the sums of all sample
+- one heattree for the sums of all samples
 - one heattree for each sample with the sums as "background"
 - one heattree for each sample without "background"
-- do not create heattrees for empty samples. They are saved in an empty_samples.txt
+- do not create heattrees for empty samples. They are saved in the file  `empty_samples.txt`
 ```
 # copy the heattree scripts in the haybaler_output_directory
 cd haybaler_output
