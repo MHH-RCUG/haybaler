@@ -150,17 +150,21 @@ def shorten_names(output_path, col, output_file):
         split_name = row.split("_")
         for n in range(len(split_name)):
             if split_name[n] == "organism" or split_name[n] == "candidatus":
+                # if "organism" or "candidatus" is in the name, the species name consists of the two following words
                 new_name = split_name[n] + "_" + split_name[n+1] + "_" + split_name[n+2]
-                new_name = subspecies(new_name, n, 3, split_name)
+                new_name = subspecies(new_name, n, 3, split_name) # check for subspecies
                 short = change_name(new_name, row, short)
                 break
-            try:
-                first_letter = ord(split_name[n][0])
-                second_letter = ord(split_name[n][1])
-                second_first = ord(split_name[n+1][0])
+            try:  # Using Unicode to find the species
+                # The species name consists of at least two words: generic and specific name.
+                # The first word starts with a capital letter
+                first_letter = ord(split_name[n][0])  # must be a capital letter
+                second_letter = ord(split_name[n][1])  # must be a lowercase letter
+                second_first = ord(split_name[n+1][0])  # must be a lowercase letter
+                # Unicode value of lowercase letters is between 97 and 122, for capital letters it is between 65 and 90
                 if 64 < first_letter < 91 and 96 < second_letter < 123 and 96 < second_first < 123:
                     new_name = split_name[n] + "_" + split_name[n+1]
-                    new_name = subspecies(new_name, n, 2, split_name)
+                    new_name = subspecies(new_name, n, 2, split_name) # check for subspecies
                     short = change_name(new_name, row, short)
                     break
             except:

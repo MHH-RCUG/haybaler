@@ -49,9 +49,15 @@ for (i in row_names){
   split_name <- unlist(strsplit(i, split = '_', fixed = TRUE))
   # find the species name
   for (n in 1:(length(split_name)-1)){ 
+    # Using Unicode to find the species 
+    # Must be a capital letter:
     first_letter <- utf8ToInt(substring(split_name[n], 1, 1))
-    rest <- utf8ToInt(substring(split_name[n], 2))
+    # Must be a lowercase letter:
+    rest <- utf8ToInt(substring(split_name[n], 2)) # second letter in first word
+    # Must be a lowercase letter:
     second_letter <- utf8ToInt(substring(split_name[n+1], 1, 1))
+    # if "organism" or "candidatus" is in the name, 
+    # the species name consists of the two following words
     if (split_name[n] == "organism" || split_name[n] == "candidatus"){
       new_name <- paste(split_name[n], split_name[n+1], split_name[n+2], sep = "_")
       if (split_name[n+3] == "subsp") {  # check for subspecies
@@ -68,7 +74,10 @@ for (i in row_names){
       
       break
     }else if(length(first_letter) == 0 || length(second_letter) == 0 || length(rest) == 0){
+      # Do nothing if one of the letters doesn't exist
     }else if(64 < first_letter && first_letter < 91 && 96 < second_letter && second_letter < 123){
+      # Unicode value of lowercase letters is between 97 and 122, 
+      # for capital letters it is between 65 and 90
       new_name <- paste(split_name[n], split_name[n+1], sep = "_")
       if (split_name[n+2] == "subsp"){  # check for subspecies
         new_name <- subspecies(new_name, split_name)

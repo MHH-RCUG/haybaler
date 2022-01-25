@@ -102,11 +102,11 @@ bash run_haybaler_tax.sh
 - one heattree for the sums of all samples
 - one heattree for each sample with the sums as "background"
 - one heattree for each sample without "background"
-- do not create heattrees for empty samples. They are saved in the file  `empty_samples.txt`
+- do not create heattrees for empty samples. They are saved in the file `empty_samples.txt`
 ```
 # copy the heattree scripts in the haybaler_output_directory
 cd haybaler_output
-cp ../create_heattrees.R ../run_heattrees.sh
+cp ../create_heattrees.R ../run_heattrees.sh .
 
 # run the scripts. Needs R installation 
 bash run_heattrees.sh
