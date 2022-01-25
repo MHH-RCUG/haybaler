@@ -144,4 +144,20 @@ if [[ $count_all_samples != 0 ]]
     mv *all_samples_heattree.pdf heattree_plots
 fi
 
+
+# move log files
+echo "moving empty_heattree_samples.txt to logs/"
+if [[ ! -d "logs" ]]
+	then
+	mkdir logs/
+fi
+
+count_empty_heattree_sample=$(ls -1 empty_heattree_samples.txt 2>/dev/null | wc -l)
+if [[ $count_empty_heattree_sample != 0 ]]
+    then
+    mv empty_heattree_samples.txt logs/
+fi
+
+
 echo "INFO: Heat tree script completed"
+
