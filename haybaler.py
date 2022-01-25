@@ -1,5 +1,6 @@
 # Haybaler
 # Sophia Poertner, Nov 2020 - April 2021
+# Lisa Hollstein, Jan 2022
 
 # Combine your Wochenende .bam.txt or reporting output from multiple samples into one matrix per stat.
 # Usage: bash run_haybaler.sh
@@ -10,10 +11,11 @@ import click
 import os
 import re
 
-version = "0.30 - April 2021"
+version = "0.31 - Jan 2022"
 
 
 # changelog
+# 0.31 shorten names, remove identifier and longer elements leaving only Genus_species
 # 0.30 read all samples in one call. Filter out taxa with values below a readcount and RPMM limit
 # 0.23 improve file input and arg handling
 # 0.22 bugfix, correct gc_ref and chr_length for new chromosomes
