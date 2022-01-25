@@ -31,7 +31,7 @@ set_ulimits () {
 }
 
 prepare_files () {
-  echo "INFO: Preparing files for R heatmap creation"
+  echo "INFO: Preparing files for R heat-tree creation"
   for infile in {RPMM,bacteria_per_human_cell}*haybaler_taxa.csv
         do
         echo "Running on " "$infile"
