@@ -1,5 +1,5 @@
 # Haybaler
-### Sophia Poertner, Colin Davenport, Lisa Hollstein, 2020-2022
+### Sophia Poertner, Colin Davenport, Lisa Hollstein 2020-2022
 
 - Combine your Wochenende .bam.txt or reporting output from multiple samples into one easy matrix.
 - Create heatmaps and heat trees in R from the results
