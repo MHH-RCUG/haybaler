@@ -63,8 +63,5 @@ python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv
 #python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --readcount_limit 1 --rpmm_limit 10
 
 # Move log file into log directory
-if [[ ! -d $outputDir/logs ]]
-    then
-    mkdir $outputDir/logs
-fi
+mkdir -p $outputDir/logs
 mv $outputDir/excluded_taxa.csv $outputDir/logs/

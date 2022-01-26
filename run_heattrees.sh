@@ -86,31 +86,11 @@ create_heattrees
 
 echo "INFO: Cleanup - creating directories and moving files"
 # check if directories exist, create them if not
-
-if [[ ! -d "heattree_plots" ]]
-        then
-	mkdir heattree_plots
-fi
-
-if [[ ! -d "heattree_plots/RPMM_background_heattrees" ]]
-        then
-	mkdir heattree_plots/RPMM_background_heattrees
-fi
-
-if [[ ! -d "heattree_plots/RPMM_no_background_heattrees" ]]
-        then
-	mkdir heattree_plots/RPMM_no_background_heattrees
-fi
-
-if [[ ! -d "heattree_plots/bphc_background_heattrees" ]]
-        then
-	mkdir heattree_plots/bphc_background_heattrees
-fi
-
-if [[ ! -d "heattree_plots/bphc_no_background_heattrees" ]]
-        then
-	mkdir heattree_plots/bphc_no_background_heattrees
-fi
+mkdir -p heattree_plots
+mkdir -p heattree_plots/RPMM_background_heattrees
+mkdir -p heattree_plots/RPMM_no_background_heattrees
+mkdir -p heattree_plots/bphc_background_heattrees
+mkdir -p heattree_plots/bphc_no_background_heattrees
 
 # move heat-trees in directories
 RPMM_count_no_background_pdf=$(ls -1 RPMM_*no_background_heattree.pdf 2>/dev/null | wc -l)
@@ -147,10 +127,8 @@ fi
 
 # move log files
 echo "moving empty_heattree_samples.txt to logs/"
-if [[ ! -d "logs" ]]
-	then
-	mkdir logs/
-fi
+
+mkdir -p logs
 
 count_empty_heattree_sample=$(ls -1 empty_heattree_samples.txt 2>/dev/null | wc -l)
 if [[ $count_empty_heattree_sample != 0 ]]

@@ -32,11 +32,7 @@ fi
 
 
 # move log files into subdirectory
-count=`ls -d logs/ 2>/dev/null | wc -l`
-if [[ $count == 0 ]]
-    then
-    mkdir logs/
-fi
+mkdir -p logs
 for file in $(ls no_*_found_for_chromosomes.csv)
 do
   mv $file logs/
