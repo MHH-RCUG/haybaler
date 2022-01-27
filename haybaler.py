@@ -282,7 +282,7 @@ def main(input_files, input_path, output_path, output_file, readcount_limit, rpm
                 f.seek(0, 0)
                 f.write(f"species" + content)
     except FileNotFoundError:
-        print("WARNING: File excluded_taxa.csv can't be read. Please check if it was created and if species column exists.")
+        print("WARNING: Output file can't be created and written")
     for haybaler_csv in os.listdir(output_path):
         if haybaler_csv.endswith(output_file):
             exclude_taxa(haybaler_csv, output_path, taxa_to_exclude)  # exclude the taxa from the haybaler.csv
