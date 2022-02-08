@@ -9,7 +9,7 @@
 
 prepare_files () {
   echo "INFO: Preparing files for R heatmap creation"
-  for infile in *haybaler.csv
+  for infile in *haybaler.csv *haybaler_short.csv
         do
         echo "Running on " $infile
 
@@ -58,7 +58,7 @@ source $WOCHENENDE_DIR/scripts/parse_yaml.sh
 eval $(parse_yaml $WOCHENENDE_DIR/config.yaml)
 
 
-count_haybaler_csv=`ls -1 *haybaler.csv 2>/dev/null | wc -l`
+count_haybaler_csv=`ls -1 *haybaler.csv *haybaler_short.csv 2>/dev/null | wc -l`
 if [[ $count_haybaler_csv != 0 ]]
     then
     # Create heatmaps with 50 taxa

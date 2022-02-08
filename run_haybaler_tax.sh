@@ -31,6 +31,14 @@ if [[ $count != 0 ]]
 fi
 
 
+# move log files into subdirectory
+mkdir -p logs
+for file in $(ls no_*_found_for_chromosomes.csv)
+do
+  mv $file logs/
+done
+
+
 # uncomment the next section for testing references (just for developers!)
 count=`ls -1 *fa*.fai 2>/dev/null | wc -l`
 if [[ $count != 0 ]]

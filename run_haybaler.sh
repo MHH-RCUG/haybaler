@@ -61,3 +61,7 @@ fi
 python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv
 # for pipeline testing only!!
 #python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --readcount_limit 1 --rpmm_limit 10
+
+# Move log file into log directory
+mkdir -p $outputDir/logs
+mv $outputDir/excluded_taxa.csv $outputDir/logs/

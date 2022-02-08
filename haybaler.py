@@ -1,5 +1,6 @@
 # Haybaler
 # Sophia Poertner, Nov 2020 - April 2021
+# Lisa Hollstein, Jan 2022
 
 # Combine your Wochenende .bam.txt or reporting output from multiple samples into one matrix per stat.
 # Usage: bash run_haybaler.sh
@@ -10,10 +11,11 @@ import click
 import os
 import re
 
-version = "0.30 - April 2021"
+version = "0.31 - Jan 2022"
 
 
 # changelog
+# 0.31 shorten names, remove identifier and longer elements leaving only Genus_species
 # 0.30 read all samples in one call. Filter out taxa with values below a readcount and RPMM limit
 # 0.23 improve file input and arg handling
 # 0.22 bugfix, correct gc_ref and chr_length for new chromosomes
@@ -140,6 +142,58 @@ def exclude_taxa(file, path, taxa_to_exclude):
     df.to_csv(path + "/" + file, sep="\t")  # save again as csv
 
 
+def shorten_names(output_path, col, output_file):
+    short = pd.read_csv(output_path + "/" + col + "_" + output_file, index_col = 0, sep = "\t")
+    rownames = list(short.index)
+    for row in rownames:
+        new_name = row
+        split_name = row.split("_")
+        for n in range(len(split_name)):
+            if split_name[n] == "organism" or split_name[n] == "candidatus":
+                # if "organism" or "candidatus" is in the name, the species name consists of the two following words
+                new_name = split_name[n] + "_" + split_name[n+1] + "_" + split_name[n+2]
+                new_name = subspecies(new_name, n, 3, split_name) # check for subspecies
+                short = change_name(new_name, row, short)
+                break
+            try:  # Using Unicode to find the species
+                # The species name consists of at least two words: generic and specific name.
+                # The first word starts with a capital letter
+                first_letter = ord(split_name[n][0])  # must be a capital letter
+                second_letter = ord(split_name[n][1])  # must be a lowercase letter
+                second_first = ord(split_name[n+1][0])  # must be a lowercase letter
+                # Unicode value of lowercase letters is between 97 and 122, for capital letters it is between 65 and 90
+                if 64 < first_letter < 91 and 96 < second_letter < 123 and 96 < second_first < 123:
+                    new_name = split_name[n] + "_" + split_name[n+1]
+                    new_name = subspecies(new_name, n, 2, split_name) # check for subspecies
+                    short = change_name(new_name, row, short)
+                    break
+            except:
+                pass
+    save_name = output_path + "/" + col + "_" + output_file
+    try:
+        save_name = save_name.split(".")[-2] + "_short.csv"
+    except:
+        save_name = save_name + "_short.csv"
+    index = short.index
+    if index.is_unique:  # only saved if all row names are unique
+        short.to_csv(save_name, sep='\t')
+
+
+def subspecies(new_name, n, count,split_name):
+    if split_name[n+count] == "subsp":
+        add = split_name[n+count+1]
+        while len(add) == 0:
+            count += 1
+            add = split_name[n+count+1]
+        new_name = new_name + "_subsp_" + add
+    return(new_name)
+
+
+def change_name(new_name, row, short):
+    short.rename(index={row:new_name}, inplace=True)
+    return(short)
+
+
 @click.command()
 @click.option('--input_files', '-i', help='Name of the input file', required=True)
 @click.option('--input_path', '-p', help='Path of the input file', required=True)
@@ -151,10 +205,12 @@ def exclude_taxa(file, path, taxa_to_exclude):
                                          'RPMM in every sample are filtered out"! Default = 300', default=300)
 def main(input_files, input_path, output_path, output_file, readcount_limit, rpmm_limit):
     list_input_files = input_files.split(";")[1:]
+    col_list = []
     # Debug prints messages on input and progress
     debug = False  # True or False
     if debug:
         print("INFO: Haybaler debug is on.")
+
     for input_file in list_input_files:
         try:
             if input_file.endswith('.csv'):
@@ -194,6 +250,8 @@ def main(input_files, input_path, output_path, output_file, readcount_limit, rpm
                         (input_file))
                 df.to_csv(output_path + "/" + col + "_" + output_file, sep='\t')
                 adding_species(output_path, col, output_file)
+                col_list.append(col)
+
 
     taxa_to_exclude = []
     excluded_taxa_readcount = None
@@ -217,14 +275,21 @@ def main(input_files, input_path, output_path, output_file, readcount_limit, rpm
     excluded_taxa_df.fillna("no", inplace=True)
     excluded_taxa_df.to_csv(output_path + "/excluded_taxa.csv", sep="\t")  # save the df with the excluded taxa and the reason
     # when concating two df's, the value species gets lost, so it needs to be added afterwards
-    with open(output_path + "/excluded_taxa.csv", 'r+') as f:
-        content = f.read()
-        if not content.split()[0] == "species":
-            f.seek(0, 0)
-            f.write(f"species" + content)
+    try:
+        with open(output_path + "/excluded_taxa.csv", 'r+') as f:
+            content = f.read()
+            if not content.split()[0] == "species":
+                f.seek(0, 0)
+                f.write(f"species" + content)
+    except FileNotFoundError:
+        print("WARNING: Output file can't be created and written")
     for haybaler_csv in os.listdir(output_path):
         if haybaler_csv.endswith(output_file):
             exclude_taxa(haybaler_csv, output_path, taxa_to_exclude)  # exclude the taxa from the haybaler.csv
+
+    # recreating all the output csv's with only species names as row names
+    for col in list(set(col_list)):
+        shorten_names(output_path, col, output_file)
 
 
 if __name__ == '__main__':
