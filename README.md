@@ -101,7 +101,7 @@ bash run_haybaler_tax.sh
 - Create Heattrees for RPMM and bacteria_per_human_cell files
 - for more information about heat trees: https://github.com/grunwaldlab/metacoder
 - needs R installation
-- Needs Metacoder package installed (makes trouble installing it, it is better to install it before running the script)
+- Needs Metacoder package installed (may cause trouble when installing, so install before haybaler)
 - exclude mouse, human and mito
 - one heattree for the sums of all samples
 - one heattree for each sample with the sums as "background"
@@ -147,5 +147,7 @@ Contributions
 
 @colindaven - concept, code review, testing
 
-@irosenboom heat-trees, testing, 
+@irosenboom heat-trees, testing
+
+@LisaHollstein Code improvements, maintainence, testing, code review, docs
 
