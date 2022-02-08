@@ -45,10 +45,12 @@ bash run_haybaler.sh
 ```
 
 #### Set lower abundance thresholds, change readcount_limit or RPMM_limit from defaults >10 and >300
-- default: readcount_limit: 10, rpmm_limit = 300
+- We set configurable lower limits to detected species so as to avoid false positive detection of various taxa. Otherwise these show up in tables and heatmaps and appear to be present, despite very weak evidence for them.
+- defaults: readcount_limit: 10 (taxa with less than 10 reads attributed are excluded)
+- defaults: rpmm_limit = 300 (taxa with an RPMM value of less than 300 are excluded)
 - open file run_haybaler.sh, edit last line
-- add –readcount_limit xx
-- add –rpmm_limit xx
+- add --readcount_limit xx
+- add --rpmm_limit xx
 ```
 # example with readcount_limit 20 and rpmm_limit 200
 python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --readcount_limit 20 --rpmm_limit 200
@@ -56,9 +58,10 @@ python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --rea
  
 ### Output
 
-The output is in the created output folder, default haybaler_output.
 
-Output is a set of CSVs. These combine the results from the original files into a single matrix, so you can better compare your samples.
+The output is in the created output folder (default: haybaler_output)
+
+Output is a set of CSVs. These combine the results from the original files into a single matrix, so you can better compare your samples. Furthermore, heatmaps and heattrees are created, provided you have an R installation set up correctly.
 
 
 ### Refining the output
@@ -96,6 +99,7 @@ conda activate haybaler
 bash run_haybaler_tax.sh
 ```
 - Create Heattrees for RPMM and bacteria_per_human_cell files
+- for more information about heat trees: https://github.com/grunwaldlab/metacoder
 - needs R installation
 - Needs Metacoder package installed (makes trouble installing it, it is better to install it before running the script)
 - exclude mouse, human and mito
@@ -136,4 +140,12 @@ node_size_axis_label <- "\nabsolute abundance among\n all samples (size)"
 title_size <- 0.05 
 ```
 
+
+Contributions
+
+@poer-sophia - main author, taxonomy, heatmaps, testing
+
+@colindaven - concept, code review, testing
+
+@irosenboom heat-trees, testing, 
 
