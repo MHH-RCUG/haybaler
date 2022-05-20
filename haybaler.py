@@ -179,7 +179,7 @@ def shorten_names(output_path, col, output_file):
         short.to_csv(save_name, sep='\t')
 
 
-def subspecies(new_name, n, count,split_name):
+def subspecies(new_name, n, count, split_name):
     if split_name[n+count] == "subsp":
         add = split_name[n+count+1]
         while len(add) == 0:
