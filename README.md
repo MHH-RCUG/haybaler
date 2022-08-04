@@ -79,7 +79,7 @@ if(length(not_installed)) install.packages(not_installed, repos="http://cran.rst
 invisible(lapply(packages, library, character.only = TRUE))
 
 
-# Install heat tree packaes in R
+# Install heat tree packages in R
 
 packages = c("metacoder", "taxa", "dplyr", "tibble", "ggplot2","stringr","RColorBrewer")
 
