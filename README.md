@@ -31,7 +31,6 @@ mamba env create -f env.haybaler.yml
 conda activate haybaler
 ```
 
-
 ### Usage
 
 ```
@@ -58,11 +57,9 @@ python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --rea
  
 ### Output
 
-
 The output is in the created output folder (default: haybaler_output)
 
 Output is a set of CSVs. These combine the results from the original files into a single matrix, so you can better compare your samples. Furthermore, heatmaps and heattrees are created, provided you have an R installation set up correctly.
-
 
 ### Refining the output and visualization
 
@@ -70,8 +67,6 @@ You can read the output into R for example and do further analyses yourself, or 
 Heatmaps and Heattrees are also generated with the `nf_wochenende.nf` pipeline, provided you have the correct R libaries installed.
 
 ### Installing R packages for heatmaps and heat-trees (eg in Rstudio)
-
-
 ```
 # Install heatmap packages in R
 packages = c("heatmaply", "RColorBrewer")
@@ -84,11 +79,6 @@ if(length(not_installed)) install.packages(not_installed, repos="http://cran.rst
 invisible(lapply(packages, library, character.only = TRUE))
 
 
-
-
-
-
-```
 # Install heat tree packaes in R
 
 packages = c("metacoder", "taxa", "dplyr", "tibble", "ggplot2","stringr","RColorBrewer")
