@@ -64,10 +64,44 @@ The output is in the created output folder (default: haybaler_output)
 Output is a set of CSVs. These combine the results from the original files into a single matrix, so you can better compare your samples. Furthermore, heatmaps and heattrees are created, provided you have an R installation set up correctly.
 
 
-### Refining the output
+### Refining the output and visualization
 
 You can read the output into R for example and do further analyses yourself, or use our heatmap and heattree scripts.
-Heatmaps and Heattrees are also generated with the `wochenende_postprocess.sh` script.
+Heatmaps and Heattrees are also generated with the `nf_wochenende.nf` pipeline, provided you have the correct R libaries installed.
+
+### Installing R packages for heatmaps and heat-trees (eg in Rstudio)
+
+
+```
+# Install heatmap packages in R
+packages = c("heatmaply", "RColorBrewer")
+
+# install uninstalled packages
+not_installed <- packages[!(packages %in% installed.packages()[ , "Package"])]  # Extract not installed packages
+if(length(not_installed)) install.packages(not_installed, repos="http://cran.rstudio.com/")  # Install not installed packages from cran 
+
+#load packages
+invisible(lapply(packages, library, character.only = TRUE))
+
+
+
+
+
+
+```
+# Install heat tree packaes in R
+
+packages = c("metacoder", "taxa", "dplyr", "tibble", "ggplot2","stringr","RColorBrewer")
+
+# install uninstalled packages
+not_installed <- packages[!(packages %in% installed.packages()[ , "Package"])]  # Extract not installed packages
+if(length(not_installed)) install.packages(not_installed, repos="http://cran.rstudio.com/")  # Install not installed packages from cran 
+
+#load packages
+invisible(lapply(packages, library, character.only = TRUE))
+
+```
+
 
 ### Heatmaps
 - exclude mouse, human, mitos
@@ -101,7 +135,7 @@ bash run_haybaler_tax.sh
 - Create Heattrees for RPMM and bacteria_per_human_cell files
 - for more information about heat trees: https://github.com/grunwaldlab/metacoder
 - needs R installation
-- Needs Metacoder package installed (may cause trouble when installing, so install before haybaler)
+- Needs Metacoder package installed (may cause trouble when installing, so install before running haybaler, see above)
 - exclude mouse, human and mito
 - one heattree for the sums of all samples
 - one heattree for each sample with the sums as "background"
