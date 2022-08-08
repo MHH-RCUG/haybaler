@@ -1,16 +1,16 @@
 # Haybaler
 ### Sophia Poertner, Colin Davenport, Lisa Hollstein 2020-2022
 
-- Combine your Wochenende .bam.txt or reporting output from multiple samples into one easy matrix.
-- Create heatmaps and heat trees in R from the results
-- Works only for Wochenende https://github.com/MHH-RCUG/Wochenende, not for Kraken (kraken2table projects exist online for that).
+- Combine your Wochenende `.bam.txt` read counts or `reporting` output of raw and normalized read counts from multiple samples into one easy matrix.
+- Create heatmaps and heat trees in R from the results (or do it yourself in R, python, etc)
+- Works best with the nextflow version of Wochenende https://github.com/MHH-RCUG/nf_wochenende and is best used together with that pipeline.
 
 
 ### Details
 - Wochenende outputs many files per sample. Every file contains different result types
 - Haybaler collates the different files to one file per result type containing all samples
 - one file per sample containing all results -> one file per result type containing all samples
-- Less files, easy to compare different samples
+- There are fewer files, so it is easy to compare different samples
 - The haybaler output is ordered by read count: the organisms/chromosome with the highest read count over all samples will be at the top of the haybaler output file
 - per default filters out every chromosome with less than 10 Reads or less than 300 RPMM in every sample
 - excluded taxa are saved (with the reason) in a separate file excluded_taxa.csv
