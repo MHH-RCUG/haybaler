@@ -9,7 +9,7 @@
 
 prepare_files () {
   echo "INFO: Preparing files for R heatmap creation"
-  for infile in *haybaler.csv *haybaler_short.csv
+  for infile in $(ls *haybaler.csv *haybaler_short.csv)
         do
         echo "Running on " $infile
 

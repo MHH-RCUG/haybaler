@@ -1,16 +1,16 @@
 # Haybaler
 ### Sophia Poertner, Colin Davenport, Lisa Hollstein 2020-2022
 
-- Combine your Wochenende .bam.txt or reporting output from multiple samples into one easy matrix.
-- Create heatmaps and heat trees in R from the results
-- Works only for Wochenende https://github.com/MHH-RCUG/Wochenende, not for Kraken (kraken2table projects exist online for that).
+- Combine your Wochenende `.bam.txt` read counts or `reporting` output of raw and normalized read counts from multiple samples into one easy matrix.
+- Create heatmaps and heat trees in R from the results (or do it yourself in R, python, etc)
+- Works best with the nextflow version of Wochenende https://github.com/MHH-RCUG/nf_wochenende and is best used together with that pipeline.
 
 
 ### Details
 - Wochenende outputs many files per sample. Every file contains different result types
 - Haybaler collates the different files to one file per result type containing all samples
 - one file per sample containing all results -> one file per result type containing all samples
-- Less files, easy to compare different samples
+- There are fewer files, so it is easy to compare different samples
 - The haybaler output is ordered by read count: the organisms/chromosome with the highest read count over all samples will be at the top of the haybaler output file
 - per default filters out every chromosome with less than 10 Reads or less than 300 RPMM in every sample
 - excluded taxa are saved (with the reason) in a separate file excluded_taxa.csv
@@ -30,7 +30,6 @@ conda env create -f env.haybaler.yml
 mamba env create -f env.haybaler.yml
 conda activate haybaler
 ```
-
 
 ### Usage
 
@@ -58,16 +57,41 @@ python3 haybaler.py -i "$input_files" -p . -op $outputDir  -o haybaler.csv --rea
  
 ### Output
 
-
 The output is in the created output folder (default: haybaler_output)
 
 Output is a set of CSVs. These combine the results from the original files into a single matrix, so you can better compare your samples. Furthermore, heatmaps and heattrees are created, provided you have an R installation set up correctly.
 
-
-### Refining the output
+### Refining the output and visualization
 
 You can read the output into R for example and do further analyses yourself, or use our heatmap and heattree scripts.
-Heatmaps and Heattrees are also generated with the `wochenende_postprocess.sh` script.
+Heatmaps and Heattrees are also generated with the `nf_wochenende.nf` pipeline, provided you have the correct R libaries installed.
+
+### Installing R packages for heatmaps and heat-trees (eg in Rstudio)
+```
+# Install heatmap packages in R
+packages = c("heatmaply", "RColorBrewer")
+
+# install uninstalled packages
+not_installed <- packages[!(packages %in% installed.packages()[ , "Package"])]  # Extract not installed packages
+if(length(not_installed)) install.packages(not_installed, repos="http://cran.rstudio.com/")  # Install not installed packages from cran 
+
+#load packages
+invisible(lapply(packages, library, character.only = TRUE))
+
+
+# Install heat tree packages in R
+
+packages = c("metacoder", "taxa", "dplyr", "tibble", "ggplot2","stringr","RColorBrewer")
+
+# install uninstalled packages
+not_installed <- packages[!(packages %in% installed.packages()[ , "Package"])]  # Extract not installed packages
+if(length(not_installed)) install.packages(not_installed, repos="http://cran.rstudio.com/")  # Install not installed packages from cran 
+
+#load packages
+invisible(lapply(packages, library, character.only = TRUE))
+
+```
+
 
 ### Heatmaps
 - exclude mouse, human, mitos
@@ -101,7 +125,7 @@ bash run_haybaler_tax.sh
 - Create Heattrees for RPMM and bacteria_per_human_cell files
 - for more information about heat trees: https://github.com/grunwaldlab/metacoder
 - needs R installation
-- Needs Metacoder package installed (may cause trouble when installing, so install before haybaler)
+- Needs Metacoder package installed (may cause trouble when installing, so install before running haybaler, see above)
 - exclude mouse, human and mito
 - one heattree for the sums of all samples
 - one heattree for each sample with the sums as "background"
