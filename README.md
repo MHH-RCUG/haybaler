@@ -17,9 +17,10 @@
 - Scripts allow data preparation for heatmaps and further analyses in R.
 
 
-### Installation via conda
+### Installation of haybaler only via conda
 First install miniconda if you have not already done this. Use mamba instead of conda if you like faster installs (follow the mamba install instructions here https://github.com/mamba-org/mamba )
 Required libs are listed in the file env.haybaler.yml
+Note - further R packages and an R installation are needed for the graphical heatmaps and heat trees, see the relevant sections below.
 ```
 # first clone haybaler
 git clone https://github.com/MHH-RCUG/haybaler
